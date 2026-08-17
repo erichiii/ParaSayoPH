@@ -2,29 +2,21 @@ const source_url = input.url;
 const pageTitle = input.title || $('h1.entry-title, h1.post-title').first().text().trim();
 const globalCategory = input.category || "Scholarship";
 
-// Stop words that indicate a header is just an article section, not a program
 const sectionKeywords = ['who is this', 'what is a', 'reminder', 'important', 'requirement', 'qualification', 'benefit', 'privilege', 'coverage', 'allowance', 'process', 'procedure', 'how to apply', 'deadline', 'overview', 'about', 'note', 'document'];
-
-// Positive words that strongly indicate an actual program title
 const programKeywords = ['scholarship', 'program', 'grant', 'assistance', 'subsidy', 'fund'];
 
 function isProgramTitle(text) {
     const lower = text.toLowerCase();
     
-    // 1. Reject if it contains section-style keywords
     if (sectionKeywords.some(kw => lower.includes(kw))) return false;
-    
-    // 2. Accept if it contains strong program keywords and is a reasonable length
     if (text.length > 10 && programKeywords.some(kw => lower.includes(kw))) return true;
     
-    // 3. Reject anything else
     return false;
 }
 
 const programs = [];
 const contentNodes = $('.entry-content').children(); 
 
-// Detect if listicle
 let isListicle = false;
 contentNodes.each((i, el) => {
     if (['H2', 'H3'].includes(el.tagName.toUpperCase()) && isProgramTitle($(el).text())) {
@@ -53,7 +45,7 @@ if (isListicle) {
                 else if (textLower.includes('tesda')) prov = 'TESDA';
 
                 currentProgram = {
-                    title: text.replace(/^[0-9]+\.\s*/, ''), // Strips leading numbers like "1. " from titles
+                    title: text.replace(/^[0-9]+\.\s*/, ''),
                     provider: prov,
                     category: globalCategory,
                     description: "",
@@ -92,8 +84,6 @@ if (isListicle) {
     });
 
 } else {
-    // Single page logic remains the same (omitted for brevity, but keep your previous single-page fallback here)
-    // ...
 }
 
 return programs;
