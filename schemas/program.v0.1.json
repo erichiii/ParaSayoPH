@@ -1,42 +1,56 @@
 {
   "title": "string",
-  "provider": "string",
-  "category": "scholarship | financial_assistance | medical_assistance | crisis_assistance | disaster_assistance | transportation_assistance | burial_assistance | ofw_assistance | training | other",
+  "provider": "string | null",
+  "category": "string",
 
   "description": "string | null",
 
   "coverage": {
     "type": "nationwide | regional | provincial | city | municipal | district | unknown",
-    "locations": ["string"]
+    "locations": []
   },
 
   "eligibility": {
-    "age_min": "integer | null",
-    "age_max": "integer | null",
-
-    "education_levels": ["string"],
-    "employment_statuses": ["string"],
-
-    "income": {
-      "min": "number | null",
-      "max": "number | null",
-      "period": "monthly | annual | null",
-      "raw_text": "string | null"
+    "age": {
+      "min": null,
+      "max": null,
+      "raw_text": null
     },
 
-    "residency_requirement": "string | null",
-    "other_requirements": ["string"]
+    "education": {
+      "levels": [],
+      "raw_text": null
+    },
+
+    "employment": {
+      "statuses": [],
+      "raw_text": null
+    },
+
+    "income": {
+      "min": null,
+      "max": null,
+      "period": null,
+      "scope": null,
+      "raw_text": null
+    },
+
+    "residency": {
+      "locations": [],
+      "raw_text": null
+    },
+
+    "other_requirements": []
   },
 
-  "benefits": ["string"],
-
-  "requirements": ["string"],
+  "benefits": [],
+  "requirements": [],
 
   "application": {
-    "start_date": "YYYY-MM-DD | null",
-    "deadline": "YYYY-MM-DD | null",
-    "process": "string | null",
-    "url": "string | null"
+    "start_date": null,
+    "deadline": null,
+    "process": null,
+    "url": null
   },
 
   "source": {

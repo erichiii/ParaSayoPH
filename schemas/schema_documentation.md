@@ -6,176 +6,237 @@
 
 ## Purpose
 
-This schema defines the common structure used by ParaSa'yo to represent public opportunities and assistance programs collected from different sources.
+This schema defines the **canonical structure** used by ParaSa'yo to represent scholarships, government assistance, training programs, and other public opportunities.
 
-All scraping categories should aim to produce data that follows this structure so that the backend can process records consistently regardless of where they came from.
+Scrapers should produce data as close to this structure as reasonably possible. However, **scraper output does not need to perfectly match this schema**.
 
-The current categories include:
+The backend is responsible for converting raw scraped data into the canonical ParaSa'yo format through:
 
-* Scholarships
-* Financial assistance
-* Medical assistance
-* Crisis assistance
-* Disaster assistance
-* Transportation assistance
-* Burial assistance
-* OFW-related assistance
-* Training programs
-* Other relevant public assistance programs
+```text
+Website
+   ↓
+Bright Data / Scraper
+   ↓
+Raw Scraped Record
+   ↓
+Normalization
+   ↓
+Validation
+   ↓
+Canonical ParaSa'yo Program
+   ↓
+Database
+```
 
-This is **Schema v0.1**. It is expected to change as we encounter real-world data that cannot be represented properly by the current structure.
+This distinction is important because scraped information can be incomplete, inconsistently formatted, or incorrectly classified.
+
+Schema `v0.1` is intentionally experimental and may change after testing against more real-world sources.
 
 ---
 
 # 1. General Rules
 
-## 1.1 Do not infer missing information
+## 1.1 Do not guess missing information
 
-Only extract information that is explicitly supported by the source.
+Only extract or normalize information that can be supported by the source.
 
-If a source does not specify an age requirement:
-
-```json
-{
-  "age_min": null,
-  "age_max": null
-}
-```
-
-Do **not** assume:
+If the source does not specify an age requirement:
 
 ```json
 {
-  "age_min": 18,
-  "age_max": 60
+  "age": {
+    "min": null,
+    "max": null,
+    "raw_text": null
+  }
 }
 ```
 
-unless the source actually states those values.
-
-The backend and matching system must be able to distinguish between:
-
-* information explicitly stated by the source;
-* information not stated by the source.
+Do **not** invent an age range.
 
 ---
 
-## 1.2 Use `null` for unknown scalar values
+## 1.2 `null` means unknown or not stated
 
-Use `null` when a single value cannot be determined from the source.
+Use `null` when a scalar value cannot be reliably determined.
 
-Examples:
+For example:
 
 ```json
 {
-  "deadline": null,
-  "age_min": null,
-  "residency_requirement": null
+  "deadline": null
 }
 ```
 
-`null` means:
+means:
 
-> The information was not found, was not stated, or could not be determined reliably.
+> No reliable deadline was found.
 
-It does **not** automatically mean that the requirement does not exist.
-
----
-
-## 1.3 Use `[]` for list fields with no extracted values
-
-Fields that can contain multiple values should always be arrays.
-
-Example:
+Do not use placeholder values such as:
 
 ```json
 {
-  "education_levels": [],
-  "employment_statuses": [],
+  "deadline": "Check official page"
+}
+```
+
+A placeholder is not a date and should not be stored as one.
+
+Similarly:
+
+```json
+{
+  "income": {
+    "max": null
+  }
+}
+```
+
+does not mean there is no income restriction. It means no structured maximum could be reliably determined.
+
+---
+
+## 1.3 `[]` means no extracted list values
+
+Fields that may contain multiple values should use arrays.
+
+```json
+{
   "benefits": [],
   "requirements": []
 }
 ```
 
-If values are available:
+When information is available:
 
 ```json
 {
-  "education_levels": [
-    "senior_high_school",
-    "undergraduate"
+  "benefits": [
+    "Medical assistance",
+    "Transportation assistance"
   ]
 }
 ```
 
 ---
 
-## 1.4 Preserve complicated requirements as text
+## 1.4 Preserve raw eligibility text
 
-Not every eligibility condition can be converted into a number or predefined field.
+Real eligibility conditions are often more complicated than a simple number or category.
 
 For example:
 
-> Applicant must belong to a family currently experiencing a crisis situation as assessed by a social worker.
+> Must be a qualified dependent of an active OWWA-member OFW.
 
-This should be preserved under:
+Instead of discarding this because it does not currently have a dedicated field:
 
 ```json
 {
   "other_requirements": [
-    "Applicant must belong to a family currently experiencing a crisis situation as assessed by a social worker."
+    "Must be a qualified dependent of an active OWWA-member OFW."
   ]
 }
 ```
 
-Do not remove important details just to make the information fit a structured field.
+Structured fields should be used when information can be reliably extracted, while raw text should preserve important context.
 
 ---
 
-## 1.5 Never fabricate values to complete the schema
+## 1.5 Do not force information into the wrong field
 
-A valid record may contain multiple `null` values or empty arrays.
+If a requirement cannot be represented accurately using a structured field, preserve it as text instead.
 
-Incomplete source information is preferable to incorrect information.
+For example:
+
+> Applicant must belong to an indigent family.
+
+Do not invent an income value.
+
+Use:
+
+```json
+{
+  "income": {
+    "min": null,
+    "max": null,
+    "period": null,
+    "scope": null,
+    "raw_text": "Applicant must belong to an indigent family."
+  }
+}
+```
 
 ---
 
-# 2. Schema Overview
+## 1.6 Scraped JSON is not automatically trusted data
+
+Receiving structured JSON from a scraper does not guarantee that every field is correct.
+
+Scraping may result in:
+
+* Missing eligibility information
+* Incorrect program boundaries
+* Section headings being mistaken for programs
+* Requirements from unrelated sections
+* Incorrect provider identification
+* Incorrect program status
+* Missing locations
+* Information from multiple programs being combined
+
+Because of this, raw scraper output should pass through backend normalization and validation before becoming a canonical program.
+
+---
+
+# 2. Canonical Schema Overview
 
 ```json
 {
   "title": "string",
-  "provider": "string",
+  "provider": "string | null",
   "category": "string",
 
   "description": "string | null",
 
   "coverage": {
-    "type": "string",
-    "locations": ["string"]
+    "type": "nationwide | regional | provincial | city | municipal | district | unknown",
+    "locations": []
   },
 
   "eligibility": {
-    "age_min": "integer | null",
-    "age_max": "integer | null",
+    "age": {
+      "min": "integer | null",
+      "max": "integer | null",
+      "raw_text": "string | null"
+    },
 
-    "education_levels": ["string"],
-    "employment_statuses": ["string"],
+    "education": {
+      "levels": [],
+      "raw_text": "string | null"
+    },
+
+    "employment": {
+      "statuses": [],
+      "raw_text": "string | null"
+    },
 
     "income": {
       "min": "number | null",
       "max": "number | null",
       "period": "string | null",
+      "scope": "string | null",
       "raw_text": "string | null"
     },
 
-    "residency_requirement": "string | null",
-    "other_requirements": ["string"]
+    "residency": {
+      "locations": [],
+      "raw_text": "string | null"
+    },
+
+    "other_requirements": []
   },
 
-  "benefits": ["string"],
-
-  "requirements": ["string"],
+  "benefits": [],
+  "requirements": [],
 
   "application": {
     "start_date": "YYYY-MM-DD | null",
@@ -189,47 +250,48 @@ Incomplete source information is preferable to incorrect information.
     "last_verified_at": "ISO-8601 datetime"
   },
 
-  "status": "string"
+  "status": "open | ongoing | upcoming | closed | unknown"
 }
 ```
 
 ---
 
-# 3. Field Reference
+# 3. Core Program Fields
 
 ## `title`
 
 **Type:** `string`
 **Required:** Yes
 
-Official or commonly used name of the program.
+Official or commonly recognized name of the program.
 
 Example:
 
 ```json
 {
-  "title": "Assistance to Individuals in Crisis Situation"
+  "title": "CHED Merit Scholarship Program"
 }
 ```
 
-Avoid creating a new title when an official program name is available.
+Avoid treating article headings or group headings as programs.
+
+For example:
+
+```text
+Local Government and Public Institution Scholarships
+```
+
+may describe a section containing multiple programs rather than one actual program.
 
 ---
 
 ## `provider`
 
-**Type:** `string`
-**Required:** Yes
+**Type:** `string | null`
 
-Organization, agency, institution, or government unit responsible for the program.
+Agency, institution, organization, or local government unit responsible for the program.
 
-Examples:
-
-```json
-{
-  "provider": "Department of Social Welfare and Development"
-}
-```
+Example:
 
 ```json
 {
@@ -237,26 +299,47 @@ Examples:
 }
 ```
 
+If the provider cannot be reliably determined:
+
 ```json
 {
-  "provider": "Overseas Workers Welfare Administration"
+  "provider": null
 }
 ```
 
-Prefer the official provider name when it can be identified.
+Do not use values such as:
 
-Provider normalization such as converting `"DSWD"` and `"Department of Social Welfare and Development"` into one canonical representation may be handled by the backend.
+```text
+Unknown / General
+```
+
+as canonical provider names.
+
+Provider normalization may be handled by the backend.
+
+For example:
+
+```text
+CHED
+Commission on Higher Education
+
+        ↓
+
+Commission on Higher Education
+```
 
 ---
+
+# 4. Category
 
 ## `category`
 
 **Type:** `string`
 **Required:** Yes
 
-Primary category of the program.
+Primary category representing the main purpose of the program.
 
-Current allowed values:
+Current values:
 
 ```text
 scholarship
@@ -271,15 +354,32 @@ training
 other
 ```
 
-Use the category that best represents the **overall purpose of the program**.
+Use lowercase `snake_case`.
 
-A program may provide multiple types of benefits. Do not create duplicate records solely because one program provides several forms of assistance.
+Do not use inconsistent variants such as:
 
-For example, a crisis assistance program may have:
+```text
+Government Scholarships
+Scholarship
+SCHOLARSHIPS
+```
+
+The canonical representation should be:
+
+```json
+{
+  "category": "scholarship"
+}
+```
+
+A single program may provide multiple forms of assistance.
+
+For example:
 
 ```json
 {
   "category": "crisis_assistance",
+
   "benefits": [
     "Medical assistance",
     "Burial assistance",
@@ -288,46 +388,46 @@ For example, a crisis assistance program may have:
 }
 ```
 
+Do not create duplicate program records solely because one program offers several benefits.
+
 ---
 
-# 4. Description
+# 5. Description
 
 ## `description`
 
 **Type:** `string | null`
 
-A short description explaining what the program is and whom it is intended to help.
+Short explanation of what the program does and who it is intended to help.
 
 Example:
 
 ```json
 {
-  "description": "Provides assistance to individuals and families experiencing crisis situations."
+  "description": "Provides financial assistance to qualified incoming first-year college students."
 }
 ```
 
-Keep the meaning of the original source. Avoid adding claims that are not supported by it.
+Descriptions should not accidentally include content belonging to the next program or unrelated parts of the source page.
 
 ---
 
-# 5. Geographic Coverage
-
-## `coverage`
-
-Describes where the program is available.
+# 6. Geographic Coverage
 
 ```json
 {
   "coverage": {
-    "type": "nationwide",
-    "locations": ["Philippines"]
+    "type": "provincial",
+    "locations": [
+      "Northern Samar"
+    ]
   }
 }
 ```
 
-### `coverage.type`
+## `coverage.type`
 
-Current allowed values:
+Allowed values:
 
 ```text
 nationwide
@@ -339,36 +439,44 @@ district
 unknown
 ```
 
-Examples:
+## `coverage.locations`
 
-Nationwide:
+**Type:** `array[string]`
+
+Specific geographic areas where the program is available.
+
+Examples:
 
 ```json
 {
   "type": "nationwide",
-  "locations": ["Philippines"]
+  "locations": [
+    "Philippines"
+  ]
 }
 ```
-
-Regional:
 
 ```json
 {
-  "type": "regional",
-  "locations": ["Region VII"]
+  "type": "provincial",
+  "locations": [
+    "Iloilo"
+  ]
 }
 ```
-
-City:
 
 ```json
 {
   "type": "city",
-  "locations": ["Manila"]
+  "locations": [
+    "Davao City"
+  ]
 }
 ```
 
-If the geographic coverage cannot be determined:
+Do not mark a program as `regional` simply because its exact coverage could not be extracted.
+
+When coverage cannot be determined:
 
 ```json
 {
@@ -377,111 +485,118 @@ If the geographic coverage cannot be determined:
 }
 ```
 
-Do not assume that a program is nationwide simply because it is operated by a national government agency.
+---
+
+# 7. Eligibility
+
+Eligibility contains both **structured values** and **raw text**.
+
+This allows ParaSa'yo to eventually perform matching while still preserving conditions that cannot yet be represented structurally.
 
 ---
 
-# 6. Eligibility
-
-The `eligibility` object contains conditions determining who may qualify for the program.
+## `eligibility.age`
 
 ```json
 {
-  "eligibility": {
-    "age_min": null,
-    "age_max": null,
-    "education_levels": [],
-    "employment_statuses": [],
-    "income": {
-      "min": null,
-      "max": null,
-      "period": null,
-      "raw_text": null
-    },
-    "residency_requirement": null,
-    "other_requirements": []
+  "age": {
+    "min": null,
+    "max": 25,
+    "raw_text": "Applicant must be no more than 25 years old."
+  }
+}
+```
+
+### `min`
+
+Minimum age explicitly stated by the source.
+
+### `max`
+
+Maximum age explicitly stated by the source.
+
+### `raw_text`
+
+Original or faithfully preserved description of the age requirement.
+
+If no age requirement is found:
+
+```json
+{
+  "age": {
+    "min": null,
+    "max": null,
+    "raw_text": null
   }
 }
 ```
 
 ---
 
-## `age_min` / `age_max`
+# 8. Education Eligibility
 
-**Type:** `integer | null`
-
-Minimum and maximum ages explicitly stated by the source.
-
-Example:
+## `eligibility.education`
 
 ```json
 {
-  "age_min": 18,
-  "age_max": 30
+  "education": {
+    "levels": [
+      "incoming_first_year_college"
+    ],
+    "raw_text": "Applicant must be an incoming first-year college student."
+  }
 }
 ```
 
-If no age restriction is stated:
+### `levels`
+
+Structured education classifications when they can be determined.
+
+### `raw_text`
+
+Preserves the actual education condition from the source.
+
+Avoid vague structured values such as:
+
+```text
+Various
+```
+
+when the actual eligibility condition can be preserved.
+
+---
+
+# 9. Employment Eligibility
+
+## `eligibility.employment`
 
 ```json
 {
-  "age_min": null,
-  "age_max": null
+  "employment": {
+    "statuses": [
+      "unemployed"
+    ],
+    "raw_text": "Applicant must currently be unemployed."
+  }
+}
+```
+
+If employment is not relevant or cannot be determined:
+
+```json
+{
+  "employment": {
+    "statuses": [],
+    "raw_text": null
+  }
 }
 ```
 
 ---
 
-## `education_levels`
+# 10. Income Eligibility
 
-**Type:** `array[string]`
-
-Education levels explicitly associated with eligibility.
-
-Example:
-
-```json
-{
-  "education_levels": [
-    "senior_high_school_graduate",
-    "undergraduate"
-  ]
-}
-```
-
-For v0.1, uncommon education descriptions may be preserved as strings rather than forcing them into an incorrect classification.
-
----
-
-## `employment_statuses`
-
-**Type:** `array[string]`
-
-Employment-related eligibility stated by the source.
-
-Example:
-
-```json
-{
-  "employment_statuses": [
-    "unemployed"
-  ]
-}
-```
-
-If employment status is irrelevant or not specified:
-
-```json
-{
-  "employment_statuses": []
-}
-```
-
----
-
-# 7. Income Requirement
-
-Income is represented using both structured values and the original meaning.
+## `eligibility.income`
 
 ```json
 {
@@ -489,24 +604,23 @@ Income is represented using both structured values and the original meaning.
     "min": null,
     "max": 400000,
     "period": "annual",
-    "raw_text": "Combined annual gross income of parents or guardian must not exceed PHP 400,000."
+    "scope": "household",
+    "raw_text": "Household annual income must not exceed PHP 400,000."
   }
 }
 ```
 
-## `income.min`
+### `min`
 
-Minimum income requirement, if explicitly specified.
+Minimum income value, if explicitly stated.
 
-## `income.max`
+### `max`
 
-Maximum income requirement, if explicitly specified.
+Maximum income value, if explicitly stated.
 
-## `income.period`
+### `period`
 
-Period associated with the income amount.
-
-Current expected values include:
+Examples:
 
 ```text
 monthly
@@ -514,117 +628,138 @@ annual
 null
 ```
 
-Additional values may be introduced if real sources require them.
+### `scope`
 
-## `income.raw_text`
+Identifies whose income is being measured.
 
-The original income condition or a faithful representation of it.
+Examples may include:
 
-This field is important because many government programs describe income eligibility in ways that cannot be represented accurately using numbers.
+```text
+individual
+household
+family
+parents
+ofw
+```
 
-Example:
+If this cannot be reliably classified:
 
 ```json
 {
-  "min": null,
-  "max": null,
-  "period": null,
-  "raw_text": "Applicant must belong to an indigent family."
+  "scope": null
 }
 ```
 
-Do **not** invent an income threshold for conditions like this.
+### `raw_text`
+
+Preserves the source's actual income condition.
+
+This field is important because many programs describe financial eligibility in ways that cannot be represented using only a number.
 
 ---
 
-# 8. Residency Requirement
+# 11. Residency Eligibility
 
-## `residency_requirement`
-
-**Type:** `string | null`
-
-Residency-related eligibility condition.
-
-Example:
+## `eligibility.residency`
 
 ```json
 {
-  "residency_requirement": "Must be a resident of Manila for at least six months."
+  "residency": {
+    "locations": [
+      "Iloilo Province"
+    ],
+    "raw_text": "Applicant must be a resident of Iloilo Province."
+  }
 }
 ```
 
-This is different from `coverage`.
+Do not confuse **citizenship** with **residency**.
 
-`coverage` describes **where the program operates**.
+For example:
 
-`residency_requirement` describes **what residency condition an applicant must satisfy**.
+```text
+Must be a Filipino citizen
+```
+
+does not mean:
+
+```json
+{
+  "residency": {
+    "locations": ["Philippines"]
+  }
+}
+```
+
+Citizenship requirements that do not currently have a dedicated structured field can temporarily be preserved under `other_requirements`.
 
 ---
 
-# 9. Other Eligibility Requirements
+# 12. Other Eligibility Requirements
 
-## `other_requirements`
+## `eligibility.other_requirements`
 
 **Type:** `array[string]`
 
-Eligibility conditions that do not fit safely into the structured fields.
+Conditions that cannot yet be represented by the structured eligibility fields.
 
 Example:
 
 ```json
 {
   "other_requirements": [
-    "Must be an active OWWA member.",
-    "Applicant must be a dependent of an OFW."
+    "Must be a Filipino citizen.",
+    "Must be a dependent of an active OWWA-member OFW.",
+    "Must pass the DOST-SEI qualifying examination."
   ]
 }
 ```
 
-This field should preserve important eligibility information instead of discarding it.
+Future schema versions may introduce dedicated fields if recurring requirements justify them.
 
 ---
 
-# 10. Benefits
+# 13. Benefits
 
 ## `benefits`
 
 **Type:** `array[string]`
 
-Assistance, services, grants, subsidies, or other benefits provided by the program.
+Actual assistance, financial support, services, grants, subsidies, or other benefits provided by the program.
 
 Example:
 
 ```json
 {
   "benefits": [
-    "Medical assistance",
-    "Transportation assistance",
-    "Financial assistance"
+    "Tuition assistance",
+    "Book allowance",
+    "Monthly stipend"
   ]
 }
 ```
 
-When an exact monetary benefit is stated, preserve that information:
+If an exact amount is known:
 
 ```json
 {
   "benefits": [
-    "Financial assistance of up to PHP 10,000"
+    "Educational assistance of up to PHP 100,000 per school year"
   ]
 }
 ```
 
-Do not infer an amount when none is provided.
+Do not invent benefit values.
 
 ---
 
-# 11. Documentary Requirements
+# 14. Requirements
 
 ## `requirements`
 
 **Type:** `array[string]`
 
-Documents or materials that applicants are required to submit.
+Documents or materials that applicants must submit.
 
 Example:
 
@@ -632,33 +767,40 @@ Example:
 {
   "requirements": [
     "Valid government-issued ID",
-    "Barangay certificate",
-    "Medical certificate"
+    "Certificate of enrollment",
+    "Proof of income"
   ]
 }
 ```
 
-Do not confuse documentary requirements with eligibility conditions.
+Do not place general advice, agency names, unrelated links, or article content in this field.
 
-For example:
-
-```text
-Must be a Manila resident
-```
-
-belongs under `eligibility`.
+For example, these are **not** documentary requirements:
 
 ```text
-Proof of residency
+Check if the scholarship is currently open.
+Prepare your documents early.
+Check your email for updates.
+Commission on Higher Education
 ```
 
-belongs under `requirements`.
+Also distinguish between:
+
+```text
+Must be a resident of Manila
+```
+
+which is **eligibility**, and:
+
+```text
+Proof of Manila residency
+```
+
+which is a **documentary requirement**.
 
 ---
 
-# 12. Application
-
-Application-related information is grouped under the `application` object.
+# 15. Application Information
 
 ```json
 {
@@ -675,8 +817,6 @@ Application-related information is grouped under the `application` object.
 
 **Type:** `YYYY-MM-DD | null`
 
-Date applications begin.
-
 Example:
 
 ```json
@@ -691,8 +831,6 @@ Example:
 
 **Type:** `YYYY-MM-DD | null`
 
-Application cutoff date.
-
 Example:
 
 ```json
@@ -701,7 +839,7 @@ Example:
 }
 ```
 
-If no deadline is stated:
+If no reliable deadline is available:
 
 ```json
 {
@@ -709,7 +847,13 @@ If no deadline is stated:
 }
 ```
 
-A missing deadline does **not** automatically mean that the program is ongoing.
+Never use:
+
+```json
+{
+  "deadline": "Check official page"
+}
+```
 
 ---
 
@@ -717,17 +861,17 @@ A missing deadline does **not** automatically mean that the program is ongoing.
 
 **Type:** `string | null`
 
-Instructions explaining how an applicant applies.
+Instructions explaining how the applicant applies.
 
 Example:
 
 ```json
 {
-  "process": "Submit the required documents to the nearest DSWD field office for assessment."
+  "process": "Submit the required documents to the nearest regional office."
 }
 ```
 
-This is especially important for programs that do not have online applications.
+Do not include generic application advice unrelated to the specific program.
 
 ---
 
@@ -735,7 +879,7 @@ This is especially important for programs that do not have online applications.
 
 **Type:** `string | null`
 
-Direct application URL, if one exists.
+Direct application page or portal.
 
 Example:
 
@@ -745,7 +889,7 @@ Example:
 }
 ```
 
-If applications must be submitted physically or no application portal is provided:
+If no online application portal exists or it cannot be determined:
 
 ```json
 {
@@ -753,70 +897,55 @@ If applications must be submitted physically or no application portal is provide
 }
 ```
 
-Do not use the general agency homepage as the application URL unless it is actually where applications are submitted.
-
 ---
 
-# 13. Source
-
-Every program must remain traceable to its source.
+# 16. Source Information
 
 ```json
 {
   "source": {
-    "url": "https://example.gov.ph/program/example-program",
-    "last_verified_at": "2026-08-17T17:30:00+08:00"
+    "url": "https://example.gov.ph/program/example",
+    "last_verified_at": "2026-08-17T18:00:00+08:00"
   }
 }
 ```
 
 ## `source.url`
 
-**Required:** Yes
+Exact URL from which the program information was obtained.
 
-Exact webpage where the program information was obtained.
+Whenever possible, ParaSa'yo should prefer **authoritative sources**, such as:
 
-Prefer:
+1. Official national government agency pages
+2. Official regional government pages
+3. Official LGU pages
+4. Official program/application portals
 
-```text
-https://agency.gov.ph/programs/example-assistance
-```
-
-over:
-
-```text
-https://agency.gov.ph
-```
-
-when the first URL contains the actual program information.
+Third-party aggregators may still be useful for **program discovery**, but the program should ideally be verified against an authoritative source before being treated as trusted data.
 
 ---
 
 ## `source.last_verified_at`
 
-**Required:** Yes
+Timestamp indicating when ParaSa'yo last checked the source.
 
-Timestamp representing when the source was last checked.
-
-Use ISO-8601 format.
+Use ISO-8601.
 
 Example:
 
 ```text
-2026-08-17T17:30:00+08:00
+2026-08-17T18:00:00+08:00
 ```
 
-This does **not** mean the government agency updated the page at that time. It means ParaSa'yo checked the source at that time.
+This represents when **ParaSa'yo verified the source**, not when the government agency last updated the page.
 
 ---
 
-# 14. Status
+# 17. Program Status
 
 ## `status`
 
-Represents the program's current application/availability state.
-
-Current allowed values:
+Allowed values:
 
 ```text
 open
@@ -828,13 +957,13 @@ unknown
 
 ### `open`
 
-Applications are currently being accepted and the program has a defined application period.
+Applications are currently being accepted within a defined application period.
 
 ### `ongoing`
 
-The program appears to operate continuously or accepts applications without a fixed application window.
+The program operates continuously or accepts applications without a fixed application window.
 
-Common for some government and social assistance programs.
+This may be common for certain government and social assistance programs.
 
 ### `upcoming`
 
@@ -842,13 +971,13 @@ Applications are expected to open in the future.
 
 ### `closed`
 
-The application period has ended or the source explicitly states that applications are closed.
+Applications are no longer being accepted.
 
 ### `unknown`
 
-The current availability cannot be reliably determined.
+Current availability cannot be reliably determined.
 
-When uncertain, use:
+When the source does not provide enough information, prefer:
 
 ```json
 {
@@ -856,204 +985,254 @@ When uncertain, use:
 }
 ```
 
-Do not automatically mark a program as `ongoing` simply because no deadline was found.
-
----
-
-# 15. Complete Example
+Do not automatically use:
 
 ```json
 {
-  "title": "Example Crisis Assistance Program",
-  "provider": "Example Government Agency",
-  "category": "crisis_assistance",
+  "status": "open"
+}
+```
 
-  "description": "Provides assistance to qualified individuals and families experiencing crisis situations.",
+or:
+
+```json
+{
+  "status": "ongoing"
+}
+```
+
+simply because no deadline was found.
+
+---
+
+# 18. Raw Scraped Data vs Canonical Data
+
+ParaSa'yo distinguishes between **raw scraper output** and a **canonical Program**.
+
+## Raw record
+
+This is exactly or nearly exactly what Bright Data or another scraper produced.
+
+It may contain:
+
+* Incorrect formatting
+* Missing information
+* Additional fields
+* Incorrect classifications
+* Placeholder values
+* Extraction errors
+
+The backend should preserve this data before normalization.
+
+Example conceptual storage:
+
+```text
+raw_scraped_records
+
+id
+source_url
+scraped_at
+raw_data
+processing_status
+```
+
+`raw_data` may be stored as PostgreSQL `JSONB`.
+
+---
+
+## Canonical program
+
+This is the cleaned and validated representation used by ParaSa'yo.
+
+```text
+Raw Scraped Record
+        ↓
+Normalization
+        ↓
+Validation
+        ↓
+Canonical Program
+        ↓
+programs table
+```
+
+This means the scraper is **not responsible for making every field perfect**.
+
+It should extract as accurately as possible while avoiding unsupported assumptions.
+
+The backend is responsible for enforcing the canonical schema.
+
+---
+
+# 19. Example Canonical Record
+
+```json
+{
+  "title": "Example Government Scholarship",
+  "provider": "Example Government Agency",
+  "category": "scholarship",
+
+  "description": "Provides educational assistance to qualified incoming college students.",
 
   "coverage": {
     "type": "nationwide",
-    "locations": ["Philippines"]
+    "locations": [
+      "Philippines"
+    ]
   },
 
   "eligibility": {
-    "age_min": null,
-    "age_max": null,
+    "age": {
+      "min": null,
+      "max": 25,
+      "raw_text": "Applicant must be no more than 25 years old."
+    },
 
-    "education_levels": [],
-    "employment_statuses": [],
+    "education": {
+      "levels": [
+        "incoming_first_year_college"
+      ],
+      "raw_text": "Applicant must be an incoming first-year college student."
+    },
+
+    "employment": {
+      "statuses": [],
+      "raw_text": null
+    },
 
     "income": {
       "min": null,
-      "max": null,
-      "period": null,
-      "raw_text": "Applicant must be assessed as financially incapable of addressing the current crisis."
+      "max": 400000,
+      "period": "annual",
+      "scope": "household",
+      "raw_text": "Household annual income must not exceed PHP 400,000."
     },
 
-    "residency_requirement": null,
+    "residency": {
+      "locations": [],
+      "raw_text": null
+    },
 
     "other_requirements": [
-      "Applicant must currently be experiencing a crisis situation."
+      "Must be a Filipino citizen."
     ]
   },
 
   "benefits": [
-    "Medical assistance",
-    "Burial assistance",
-    "Transportation assistance"
+    "Tuition assistance",
+    "Monthly allowance"
   ],
 
   "requirements": [
-    "Valid government-issued ID",
-    "Supporting documents related to the requested assistance"
+    "Proof of enrollment",
+    "Proof of household income"
   ],
 
   "application": {
     "start_date": null,
     "deadline": null,
-    "process": "Submit the required documents to the appropriate government office for assessment.",
-    "url": null
+    "process": "Submit the required documents through the official application portal.",
+    "url": "https://example.gov.ph/apply"
   },
 
   "source": {
-    "url": "https://example.gov.ph/programs/crisis-assistance",
-    "last_verified_at": "2026-08-17T17:30:00+08:00"
+    "url": "https://example.gov.ph/program/example-scholarship",
+    "last_verified_at": "2026-08-17T18:00:00+08:00"
   },
 
-  "status": "ongoing"
+  "status": "unknown"
 }
 ```
 
 ---
 
-# 16. Scraper Responsibilities vs Backend Responsibilities
+# 20. Schema Evolution
 
-The scraper and backend have different responsibilities.
-
-## Scraper
-
-The scraper should:
-
-1. Find relevant program pages.
-2. Extract information supported by the source.
-3. Preserve important text.
-4. Produce data as close as possible to this schema.
-5. Use `null` or `[]` instead of guessing missing values.
-6. Include the exact source URL.
-
-The scraper does **not** need to solve every normalization problem.
-
----
-
-## Backend
-
-The backend will eventually handle:
-
-```text
-Scraped Record
-      ↓
-Normalization
-      ↓
-Validation
-      ↓
-Deduplication
-      ↓
-Database
-      ↓
-Matching Engine
-      ↓
-API
-```
-
-Examples of backend normalization may include:
-
-```text
-"DSWD"
-"Department of Social Welfare & Development"
-"Department of Social Welfare and Development"
-
-                ↓
-
-Department of Social Welfare and Development
-```
-
-or:
-
-```text
-"Scholarship"
-"SCHOLARSHIP"
-"scholarships"
-
-        ↓
-
-scholarship
-```
-
-This separation prevents every scraper from implementing its own interpretation of the data.
-
----
-
-# 17. Schema Evolution
-
-This schema is intentionally versioned:
-
-```text
-program.v0.1.json
-```
-
-Do not modify the meaning of existing fields silently once multiple team members are using the schema.
-
-When real-world scraping reveals a limitation:
-
-1. Save the problematic example.
-2. Document why the current schema cannot represent it properly.
-3. Discuss the change with the team.
-4. Update the schema.
-5. Increment the version when necessary.
-
-Example:
+This schema is versioned because ParaSa'yo will encounter requirements that cannot yet be represented perfectly.
 
 ```text
 program.v0.1.json
         ↓
-Real DSWD / CHED / OWWA data
+Real scraped data
         ↓
 Schema limitation discovered
         ↓
-Team discussion
+Document example
+        ↓
+Discuss with team
+        ↓
+Schema update
         ↓
 program.v0.2.json
 ```
 
-The goal of v0.1 is **not to predict every possible government program**.
+Do not add a new field for every unusual program encountered.
 
-The goal is to provide a common, safe, and testable structure that lets the scraping and backend teams start integrating real data.
+A new structured field should generally be considered when:
+
+* The information appears across multiple programs
+* It is important for user matching
+* Representing it structurally provides clear value
+* Its meaning can be consistently defined
+
+Until then, preserve the condition using the appropriate `raw_text` or `other_requirements` field.
 
 ---
 
-# Quick Reference
-
-When scraping, remember:
+# 21. Quick Reference for Scraper Developers
 
 ```text
-Missing scalar value      → null
+Unknown scalar
+→ null
 
-Missing list values       → []
+No extracted list items
+→ []
 
-Not explicitly stated     → DO NOT GUESS
+Information not stated
+→ DO NOT GUESS
 
-Complex eligibility       → other_requirements
+Unknown deadline
+→ null
 
-Complex income condition  → income.raw_text
+Unknown provider
+→ null
 
-No deadline found         → deadline: null
-                            NOT automatically "ongoing"
+Unknown status
+→ "unknown"
 
-No online application     → application.url: null
+Complex eligibility
+→ preserve in raw_text / other_requirements
 
-Program information       → exact source URL
+Income amount found
+→ structured value + raw_text
 
-Multiple assistance types → one program with multiple benefits
-                            when they belong to the same program
+Age requirement found
+→ structured value + raw_text
+
+Citizenship
+→ do not treat as residency
+
+Document to submit
+→ requirements
+
+Condition applicant must satisfy
+→ eligibility
+
+Third-party article
+→ useful for discovery
+
+Official government/program page
+→ preferred source for verification
 ```
 
-**When in doubt, preserve the source information rather than forcing it into an incorrect structured value.**
+---
+
+# 22. Main Principle
+
+When deciding how to represent information, prioritize:
+
+**accuracy → traceability → structure**
+
+over trying to fill every field.
+
+A partially structured record that faithfully represents the source is more useful to ParaSa'yo than a completely filled record containing assumptions.
