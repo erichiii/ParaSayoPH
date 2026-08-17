@@ -1,0 +1,48 @@
+{
+  "title": "string",
+  "provider": "string",
+  "category": "scholarship | financial_assistance | medical_assistance | crisis_assistance | disaster_assistance | transportation_assistance | burial_assistance | ofw_assistance | training | other",
+
+  "description": "string | null",
+
+  "coverage": {
+    "type": "nationwide | regional | provincial | city | municipal | district | unknown",
+    "locations": ["string"]
+  },
+
+  "eligibility": {
+    "age_min": "integer | null",
+    "age_max": "integer | null",
+
+    "education_levels": ["string"],
+    "employment_statuses": ["string"],
+
+    "income": {
+      "min": "number | null",
+      "max": "number | null",
+      "period": "monthly | annual | null",
+      "raw_text": "string | null"
+    },
+
+    "residency_requirement": "string | null",
+    "other_requirements": ["string"]
+  },
+
+  "benefits": ["string"],
+
+  "requirements": ["string"],
+
+  "application": {
+    "start_date": "YYYY-MM-DD | null",
+    "deadline": "YYYY-MM-DD | null",
+    "process": "string | null",
+    "url": "string | null"
+  },
+
+  "source": {
+    "url": "string",
+    "last_verified_at": "ISO-8601 datetime"
+  },
+
+  "status": "open | ongoing | upcoming | closed | unknown"
+}
