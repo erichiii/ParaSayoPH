@@ -4,6 +4,8 @@ from typing import Any
 
 from pydantic import ValidationError
 
+from urllib.parse import urlparse
+
 from app.database import supabase
 from app.schemas.program import ProgramData, VALID_STATUSES
 from app.services.normalization import normalize_program
@@ -12,6 +14,16 @@ from app.services.normalization import normalize_program
 TABLE_RAW = "raw_scraped_records"
 TABLE_PROGRAMS = "programs"
 
+def _is_valid_url(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+
+    parsed = urlparse(value)
+
+    return (
+        parsed.scheme in {"http", "https"}
+        and bool(parsed.netloc)
+    )
 
 def _classify(
     raw_data: dict[str, Any],
@@ -38,11 +50,21 @@ def _classify(
     # Quality checks
     review_reasons: list[str] = []
 
+    if not program.provider or not program.provider.strip():
+        review_reasons.append(
+            "provider is missing or blank"
+        )
+
     source_url = program.source.get("url")
 
     if not source_url or not str(source_url).strip():
         review_reasons.append(
             "source.url is missing or blank"
+        )
+
+    elif not _is_valid_url(source_url):
+        review_reasons.append(
+            "source.url is not a valid HTTP/HTTPS URL"
         )
 
     if not program.description or not program.description.strip():
