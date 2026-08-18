@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from app.database import supabase
 from app.schemas.program import ProgramData, VALID_STATUSES
+from app.services.normalization import normalize_program
 
 
 TABLE_RAW = "raw_scraped_records"
@@ -17,9 +18,10 @@ def _classify(
 ) -> tuple[str, str | None, ProgramData | None]:
     """Validate and classify one raw scraped record."""
 
-    # Structural validation
+    normalized_data = normalize_program(raw_data)
+
     try:
-        program = ProgramData.model_validate(raw_data)
+        program = ProgramData.model_validate(normalized_data)
 
     except ValidationError as exc:
         reasons = "; ".join(
