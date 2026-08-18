@@ -1,39 +1,37 @@
 const depth = input.depth || 1;
-const baseUrl = input.url;
-const depth2Urls = [];
-const extractionUrls = [];
+const categoryUrls = [];
+const articleUrls = [];
 let nextPage = null;
 
-if (depth === 1) {
+if (depth === 1 || depth === 2) {
     $('#main-content article.mh-posts-list-item').each((i, el) => {
         const url = $(el).find('h3.entry-title a').attr('href');
-        if (url) depth2Urls.push(url);
-    });
-    
-    nextPage = $('link[rel="next"]').attr('href') || $('a.next.page-numbers').attr('href');
-} 
-
-else if (depth === 2) {
-    $('.entry-content a').each((i, el) => {
-        let url = $(el).attr('href');
-
-        if (url && url.includes('scholarship.com.ph') && 
-            !url.includes('/category/') && 
-            !url.includes('/author/') && 
-            !url.includes('/page/') &&
-            !url.includes('about') &&
-            !url.includes('contact')) {
-
+        
+        if (url) {
             const cleanUrl = url.split('#')[0];
-            extractionUrls.push(cleanUrl);
+            
+            if (cleanUrl.includes('/category/')) {
+                categoryUrls.push(cleanUrl);
+            } else {
+                articleUrls.push(cleanUrl);
+            }
         }
     });
 
-    extractionUrls.push(baseUrl);
+    if (depth === 1) {
+        $('a').each((i, el) => {
+            const url = $(el).attr('href');
+            if (url && url.includes('/category/')) {
+                categoryUrls.push(url.split('#')[0]);
+            }
+        });
+    }
+    
+    nextPage = $('link[rel="next"]').attr('href') || $('a.next.page-numbers').attr('href');
 }
 
 return {
-    depth_2_urls: [...new Set(depth2Urls)],
-    extraction_urls: [...new Set(extractionUrls)],
+    category_urls: [...new Set(categoryUrls)],
+    article_urls: [...new Set(articleUrls)],
     next_page: nextPage
 };

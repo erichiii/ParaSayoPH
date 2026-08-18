@@ -67,7 +67,8 @@ function extractAge(text, ageRules) {
             }
         }
     }
-    return { min: null, max: null, raw_text: null };
+
+    return null; 
 }
 
 function extractIncome(text, incomeRules) {
