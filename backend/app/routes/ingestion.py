@@ -18,7 +18,7 @@ class IngestResponse(BaseModel):
     records_received: int
     records_inserted: int
     inserted_ids: list[int]
-
+    scrape_run_id: int | None = None
 
 @router.post(
     "/ingest",
