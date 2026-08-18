@@ -1,5 +1,12 @@
 const source_url = input.url;
-const rules = input.rules;
+
+let rules = null;
+try {
+    rules = typeof input.rules === 'string' ? JSON.parse(input.rules) : input.rules;
+} catch(e) {
+    throw new Error("Parser failed: input.rules is not a valid JSON string.");
+}
+
 const rawTitle = input.title || $('h1.entry-title, h1.post-title, h1').first().text().trim();
 const pageText = $('body').text();
 const pageTextLower = pageText.toLowerCase();

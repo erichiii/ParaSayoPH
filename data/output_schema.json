@@ -1,0 +1,90 @@
+{
+  "type": "object",
+  "fields": {
+    "url": { "type": "url", "active": true },
+    "title": { "type": "text", "active": true },
+    "provider": { "type": "text", "active": true },
+    "category": { "type": "text", "active": true },
+    "description": { "type": "text", "active": true },
+    "coverage": {
+      "type": "object",
+      "active": true,
+      "fields": {
+        "type": { "type": "text", "active": true },
+        "locations": { "type": "array", "active": true, "items": { "type": "text" } }
+      }
+    },
+    "eligibility": {
+      "type": "object",
+      "active": true,
+      "fields": {
+        "age": {
+          "type": "object",
+          "active": true,
+          "fields": {
+            "min": { "type": "number", "active": true },
+            "max": { "type": "number", "active": true },
+            "raw_text": { "type": "text", "active": true }
+          }
+        },
+        "education": {
+          "type": "object",
+          "active": true,
+          "fields": {
+            "levels": { "type": "array", "active": true, "items": { "type": "text" } },
+            "raw_text": { "type": "text", "active": true }
+          }
+        },
+        "employment": {
+          "type": "object",
+          "active": true,
+          "fields": {
+            "statuses": { "type": "array", "active": true, "items": { "type": "text" } },
+            "raw_text": { "type": "text", "active": true }
+          }
+        },
+        "income": {
+          "type": "object",
+          "active": true,
+          "fields": {
+            "min": { "type": "number", "active": true },
+            "max": { "type": "number", "active": true },
+            "period": { "type": "text", "active": true },
+            "scope": { "type": "text", "active": true },
+            "raw_text": { "type": "text", "active": true }
+          }
+        },
+        "residency": {
+          "type": "object",
+          "active": true,
+          "fields": {
+            "locations": { "type": "array", "active": true, "items": { "type": "text" } },
+            "raw_text": { "type": "text", "active": true }
+          }
+        },
+        "other_requirements": { "type": "array", "active": true, "items": { "type": "text" } }
+      }
+    },
+    "benefits": { "type": "array", "active": true, "items": { "type": "text" } },
+    "requirements": { "type": "array", "active": true, "items": { "type": "text" } },
+    "application": {
+      "type": "object",
+      "active": true,
+      "fields": {
+        "start_date": { "type": "text", "active": true },
+        "deadline": { "type": "text", "active": true },
+        "process": { "type": "text", "active": true },
+        "url": { "type": "text", "active": true }
+      }
+    },
+    "source": {
+      "type": "object",
+      "active": true,
+      "fields": {
+        "url": { "type": "url", "active": true },
+        "last_verified_at": { "type": "text", "active": true }
+      }
+    },
+    "status": { "type": "text", "active": true }
+  }
+}
