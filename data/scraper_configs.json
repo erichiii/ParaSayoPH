@@ -1,0 +1,99 @@
+{
+  "blacklists": {
+    "advice": [
+      "prepare your documents", "check if the", "confirm that you",
+      "review the accepted", "follow the correct", "submit your application",
+      "keep a copy", "check your email", "apply early", "read the official requirements",
+      "watch the video below", "guide covers", "this guide will help"
+    ]
+  },
+  "url_cleanup_params": [
+    "fbclid", "utm_source", "utm_medium", "utm_campaign"
+  ],
+  "cleaning": {
+    "title": [
+      {
+        "pattern": "\\bMega\\s+World\\b",
+        "flags": "gi",
+        "replacement": "Megaworld"
+      },
+      {
+        "pattern": "20\\d{2}[–-]20\\d{2}",
+        "flags": "g",
+        "replacement": ""
+      },
+      {
+        "pattern": "\\b(Application Guide|Guide|Philippines|Online Form|Details|Overview)\\b",
+        "flags": "gi",
+        "replacement": ""
+      }
+    ]
+  },
+  "providers": {
+    "Megaworld Foundation, Inc.": ["MEGAWORLD", "MEGA WORLD"],
+    "Commission on Higher Education": ["CHED", "COMMISSION ON HIGHER EDUCATION"],
+    "Department of Science and Technology": ["DOST", "SCIENCE AND TECHNOLOGY"],
+    "Overseas Workers Welfare Administration": ["OWWA"],
+    "Land Bank of the Philippines": ["LANDBANK"],
+    "Government Service Insurance System": ["GSIS"]
+  },
+  "extraction": {
+    "date": {
+      "months": {
+        "january": "01", "feb": "02", "february": "02", "mar": "03", "march": "03", "apr": "04", "april": "04",
+        "may": "05", "jun": "06", "june": "06", "jul": "07", "july": "07", "aug": "08", "august": "08",
+        "sep": "09", "sept": "09", "september": "09", "oct": "10", "october": "10", "nov": "11", "november": "11", "dec": "12", "december": "12"
+      },
+      "pattern": "(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\\s+(\\d{1,2}),?\\s+(\\d{4})",
+      "flags": "i"
+    },
+    "age": {
+      "exclusions": ["%", "percent", "grade", "average", "gpa", "score"],
+      "pattern": "(?:(?:not\\s*more\\s*than|no\\s*more\\s*than|maximum\\s*of|under|below|must\\s*be\\s*at\\s*most)\\s*(\\d{1,2})\\s*(?:years?\\s*(?:old|of\\s*age)|y\\/?o)|\\bage\\s*(?:limit\\s*of|of|must\\s*be\\s*(?:under|below|at\\s*most))?\\s*(\\d{1,2})\\b)",
+      "flags": "i"
+    },
+    "income": {
+      "keywords": ["income", "gross", "salary", "financial capacity", "earnings"],
+      "pattern": "(?:₱|PHP|Php)\\s*([\\d,]+(?:\\.\\d+)?)",
+      "flags": "i",
+      "scope_mapping": {
+        "parents": ["parent"],
+        "family": ["family"]
+      },
+      "period_mapping": {
+        "monthly": ["month"]
+      }
+    },
+    "education": {
+      "is_college_pattern": "college|undergraduate|bachelor|degree|freshm[ae]n|sophomore|junior|senior|tertiary",
+      "flags": "i",
+      "levels": {
+        "incoming_first_year_college": "freshm[ae]n|incoming first-year|incoming 1st year|first year college|1st year college",
+        "second_year_college": "sophomore|second year|2nd year",
+        "third_year_college": "junior|third year|3rd year",
+        "fourth_year_college": "fourth year|4th year|graduating college",
+        "senior_high_school": "scholarship for senior high|open to (?:grade 11|grade 12|senior high students)",
+        "tvet": "tvet|technical-vocational|tesda"
+      },
+      "raw_text_triggers": {
+        "subject": "freshm[ae]n|sophomores?|juniors?|undergraduate|college|year level|degree program",
+        "action": "cover|open|support|eligib|enrolled"
+      }
+    }
+  },
+  "dom_traversal": {
+    "section_triggers": {
+      "qualifications": ["qualification", "eligible"],
+      "requirements": ["requirement", "document"],
+      "benefits": ["benefit"],
+      "process": ["how to apply", "process", "step"],
+      "ignore": ["priority course", "partner school", "contact", "about", "final thoughts", "reference"]
+    },
+    "application_url_triggers": [
+      "access application", "apply form", "application portal", "/apply/form", "forms.gle"
+    ]
+  },
+  "status_evaluation": {
+    "open": ["applications ... are now open", "are now open", "accepting applications"]
+  }
+}
