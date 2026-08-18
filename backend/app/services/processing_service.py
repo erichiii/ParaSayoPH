@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 from app.database import supabase
 from app.schemas.program import ProgramData, VALID_STATUSES
 from app.services.normalization import normalize_program
+from app.services.duplicate_service import find_duplicate_program
 
 
 TABLE_RAW = "raw_scraped_records"
@@ -103,6 +104,7 @@ def process_pending_records() -> dict[str, int]:
     counts = {
         "records_checked": len(pending_records),
         "processed": 0,
+        "duplicates": 0,
         "needs_review": 0,
         "failed": 0,
     }
@@ -157,6 +159,22 @@ def process_pending_records() -> dict[str, int]:
             }).eq("id", raw_id).execute()
 
             counts["failed"] += 1
+            continue
+
+        program_data = program.model_dump()
+
+        duplicate = find_duplicate_program(program_data)
+
+        if duplicate:
+            supabase.table(TABLE_RAW).update({
+                "processing_status": "duplicate",
+                "processing_error": (
+                    f"Duplicate of program {duplicate['id']}"
+                ),
+                "duplicate_of_program_id": duplicate["id"],
+            }).eq("id", raw_id).execute()
+
+            counts["duplicates"] += 1
             continue
 
         # Build the clean programs row from validated Pydantic data.
