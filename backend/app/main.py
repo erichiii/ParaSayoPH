@@ -4,6 +4,7 @@ from app.routes.ingestion import router as ingestion_router
 from app.routes.processing import router as processing_router
 from app.routes.programs import router as programs_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes.metrics import router as metrics_router
 
 app = FastAPI(title="ParaSayoPH API")
 
@@ -21,6 +22,7 @@ app.add_middleware(
 app.include_router(ingestion_router)
 app.include_router(processing_router)
 app.include_router(programs_router)
+app.include_router(metrics_router)
 
 @app.get("/health")
 def health_check():

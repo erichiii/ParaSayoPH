@@ -15,6 +15,7 @@ router = APIRouter(
 class ProcessResponse(BaseModel):
     records_checked: int
     processed: int
+    duplicates: int
     needs_review: int
     failed: int
 
