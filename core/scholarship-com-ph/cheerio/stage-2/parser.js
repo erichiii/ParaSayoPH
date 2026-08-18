@@ -1,59 +1,40 @@
 const source_url = input.url;
-const pageTitle = input.title || $('h1.entry-title, h1.post-title').first().text().trim();
+const rawTitle = input.title || $('h1.entry-title, h1.post-title, h1').first().text().trim();
 const pageText = $('body').text();
-const pageTextUpper = pageText.toUpperCase();
+const pageTextLower = pageText.toLowerCase();
 
-const groupHeaderBlacklist = [
-    'who is this', 'what is a', 'important reminder', 'before you apply', 'frequently asked', 
-    'general guide', 'how to apply', 'documents you need', 'local government', 
-    'scholarships that are not', 'other scholarships', 'table of contents', 'summary', 
-    'conclusion', 'share this', 'scholarship guides', 'about', 'overview', 'history', 
-    'qualifications', 'requirements', 'benefits', 'priority courses', 'partner schools', 
-    'application deadline', 'contact details', 'final thoughts', 'reference', 'courses', 'schools'
-];
-
-const programKeywords = [
-    'scholarship', 'program', 'grant', 'assistance', 'subsidy', 
-    'fund', 'fellowship', 'financial help', 'tulong dunong', 'iskolar'
-];
-
-const adviceBlacklist = [
-    'prepare your documents', 'check if the', 'confirm that you',
-    'review the accepted', 'follow the correct', 'submit your application',
-    'keep a copy', 'check your email', 'check the official', 'apply early',
-    'make sure you confirm', 'check the latest announcement', 'before you submit',
-    'the programs below are connected', 'these scholarships are limited to residents',
-    'read the official requirements carefully', 'watch the video below'
-];
-
-const docRegex = /\b(certificate|certification|id|form|transcript|tor|card|proof|itr|tax return|indigency|clearance|recommendation|photo|picture|photograph|document|grades|diploma|birth certificate|statement of account|voter|payslip|bill|bills|report|curriculum|assessment|result|letter)\b/i;
-
-function isAdvice(text) {
-    if (!text) return false;
-    return adviceBlacklist.some(phrase => text.toLowerCase().includes(phrase));
+function cleanTitle(text) {
+    return text
+        .replace(/\bMega\s+World\b/gi, 'Megaworld')
+        .replace(/20\d{2}[–-]20\d{2}/g, '')
+        .replace(/\b(Application Guide|Guide|Philippines|Online Form|Details|Overview)\b/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 }
 
-function isGenuineProgramTitle(text) {
-    const lower = text.toLowerCase().trim();
-    if (text.length < 5 || text.length > 120) return false;
-    if (/^[0-9]+\.\s+/.test(text)) return true;
-    if (groupHeaderBlacklist.some(phrase => lower.includes(phrase))) return false;
-    return programKeywords.some(kw => lower.includes(kw));
-}
-
-function splitIntoSentences(text) {
-    return text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+function extractProvider(title, text) {
+    const titleUpper = title.toUpperCase();
+    const textSnippet = text.substring(0, 500).toUpperCase();
+    
+    if (titleUpper.includes('MEGAWORLD') || titleUpper.includes('MEGA WORLD') || textSnippet.includes('MEGAWORLD')) return 'Megaworld Foundation, Inc.';
+    if (titleUpper.includes('CHED') || titleUpper.includes('COMMISSION ON HIGHER EDUCATION')) return 'Commission on Higher Education';
+    if (titleUpper.includes('DOST') || titleUpper.includes('SCIENCE AND TECHNOLOGY')) return 'Department of Science and Technology';
+    if (titleUpper.includes('OWWA')) return 'Overseas Workers Welfare Administration';
+    if (titleUpper.includes('LANDBANK')) return 'Land Bank of the Philippines';
+    if (titleUpper.includes('GSIS')) return 'Government Service Insurance System';
+    
+    return null;
 }
 
 function parseDate(text) {
     const months = {
-        january:'01', jan:'01', february:'02', feb:'02', march:'03', mar:'03', april:'04', apr:'04',
-        may:'05', june:'06', jun:'06', july:'07', jul:'07', august:'08', aug:'08', september:'09', sept:'09', sep:'09',
-        october:'10', oct:'10', november:'11', nov:'11', december:'12', dec:'12'
+        january:'01', feb:'02', february:'02', mar:'03', march:'03', apr:'04', april:'04',
+        may:'05', jun:'06', june:'06', jul:'07', july:'07', aug:'08', august:'08',
+        sep:'09', sept:'09', september:'09', oct:'10', october:'10', nov:'11', november:'11', dec:'12', december:'12'
     };
-    const regex = /(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sept|sep|october|oct|november|nov|december|dec)\s+(\d{1,2}),?\s+(\d{4})/i;
+    const regex = /(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\s+(\d{1,2}),?\s+(\d{4})/i;
     const match = text.match(regex);
-    if(match) {
+    if (match) {
         const m = months[match[1].toLowerCase()];
         const d = match[2].padStart(2, '0');
         const y = match[3];
@@ -63,29 +44,36 @@ function parseDate(text) {
 }
 
 function extractAge(text) {
-    const sentences = splitIntoSentences(text);
+    const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
     for (const sentence of sentences) {
-        const match = sentence.match(/(?:not\s*more\s*than|no\s*more\s*than|maximum\s*of|under|below|must\s*be\s*at\s*most)\s*(\d{1,2})\s*(?:years?\s*old|y\/?o)?/i);
+        if (/%|percent|grade|average|gpa|score/i.test(sentence)) continue;
+        const match = sentence.match(/(?:(?:not\s*more\s*than|no\s*more\s*than|maximum\s*of|under|below|must\s*be\s*at\s*most)\s*(\d{1,2})\s*(?:years?\s*(?:old|of\s*age)|y\/?o)|\bage\s*(?:limit\s*of|of|must\s*be\s*(?:under|below|at\s*most))?\s*(\d{1,2})\b)/i);
         if (match) {
-            return { min: null, max: parseInt(match[1], 10) || null, raw_text: sentence.trim() };
+            const ageVal = parseInt(match[1] || match[2], 10);
+            if (!isNaN(ageVal) && ageVal >= 10 && ageVal <= 65) {
+                return { min: null, max: ageVal, raw_text: sentence.trim() };
+            }
         }
     }
     return { min: null, max: null, raw_text: null };
 }
 
 function extractIncome(text) {
-    const sentences = splitIntoSentences(text);
+    const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
     for (const sentence of sentences) {
-        const hasIncomeKeyword = /(?:income|gross|salary|financial capacity|earnings)/i.test(sentence);
+        const hasKeyword = /(?:income|gross|salary|financial capacity|earnings)/i.test(sentence);
         const amountMatch = sentence.match(/(?:₱|PHP|Php)\s*([\d,]+(?:\.\d+)?)/i);
-
-        if (hasIncomeKeyword && amountMatch) {
+        if (hasKeyword && amountMatch) {
             const amount = parseFloat(amountMatch[1].replace(/,/g, ''));
             if (!isNaN(amount) && amount >= 1000) {
                 let scope = "household";
                 if (/parent/i.test(sentence)) scope = "parents";
                 else if (/family/i.test(sentence)) scope = "family";
-                return { min: null, max: amount, period: /month/i.test(sentence) ? "monthly" : "annual", scope: scope, raw_text: sentence.trim() };
+                return {
+                    min: null, max: amount,
+                    period: /month/i.test(sentence) ? "monthly" : "annual",
+                    scope: scope, raw_text: sentence.trim()
+                };
             }
         }
     }
@@ -93,80 +81,76 @@ function extractIncome(text) {
 }
 
 function extractEducation(text) {
-    const sentences = splitIntoSentences(text);
     const levels = [];
-    let isolatedRawText = null;
+    const lower = text.toLowerCase();
+    
+    const isCollege = /college|undergraduate|bachelor|degree|freshm[ae]n|sophomore|junior|senior|tertiary/i.test(lower);
 
-    for (const sentence of sentences) {
-        const lower = sentence.toLowerCase();
-        let matched = false;
+    if (/freshm[ae]n|incoming first-year|incoming 1st year|first year college|1st year college/i.test(lower)) levels.push('incoming_first_year_college');
+    if (/sophomore|second year|2nd year/i.test(lower)) levels.push('second_year_college');
+    if (/junior|third year|3rd year/i.test(lower)) levels.push('third_year_college');
+    if (/fourth year|4th year|graduating college/i.test(lower)) levels.push('fourth_year_college');
 
-        if (lower.includes('incoming first-year college') || lower.includes('incoming college freshman') || lower.includes('freshmen')) {
-            if (!levels.includes('incoming_first_year_college')) levels.push('incoming_first_year_college');
-            matched = true;
-        }
-        if (lower.includes('grade 12') || lower.includes('senior high')) {
-            if (!levels.includes('senior_high_school')) levels.push('senior_high_school');
-            matched = true;
-        }
-        if (lower.includes('undergraduate') || lower.includes('college')) {
-            if (!levels.includes('college')) levels.push('college');
-            matched = true;
-        }
-        if (lower.includes('tvet') || lower.includes('technical-vocational')) {
-            if (!levels.includes('tvet')) levels.push('tvet');
-            matched = true;
-        }
-        if (matched && !isolatedRawText) isolatedRawText = sentence.trim();
+    if (/scholarship for senior high|open to (?:grade 11|grade 12|senior high students)/i.test(lower) && !isCollege) {
+        if (!levels.includes('senior_high_school')) levels.push('senior_high_school');
     }
-    return { levels: levels, raw_text: isolatedRawText };
+    if (/tvet|technical-vocational|tesda/i.test(lower) && !levels.includes('tvet')) levels.push('tvet');
+
+    let raw_text = null;
+    const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+    for (const s of sentences) {
+        if (/freshm[ae]n|sophomores?|juniors?|undergraduate|college|year level|degree program/i.test(s) && /cover|open|support|eligib|enrolled/i.test(s)) {
+            raw_text = s.trim();
+            break;
+        }
+    }
+
+    return { levels: levels, raw_text: raw_text };
 }
 
-function extractProvider(text) {
-    if (!text) return null;
-    const upper = text.toUpperCase();
-    if (upper.includes('COMMISSION ON HIGHER EDUCATION') || upper.includes('CHED')) return 'Commission on Higher Education';
-    if (upper.includes('DEPARTMENT OF SCIENCE AND TECHNOLOGY') || upper.includes('DOST')) return 'Department of Science and Technology';
-    if (upper.includes('DSWD')) return 'Department of Social Welfare and Development';
-    if (upper.includes('TESDA')) return 'Technical Education and Skills Development Authority';
-    if (upper.includes('NCIP') || upper.includes('NATIONAL COMMISSION ON INDIGENOUS PEOPLES')) return 'National Commission on Indigenous Peoples';
-    if (upper.includes('LANDBANK')) return 'Land Bank of the Philippines';
-    if (upper.includes('MEGAWORLD')) return 'Megaworld Foundation';
-    if (upper.includes('BFAR') || upper.includes('BUREAU OF FISHERIES')) return 'Bureau of Fisheries and Aquatic Resources';
-    if (upper.includes('DAR') || upper.includes('DEPARTMENT OF AGRARIAN REFORM')) return 'Department of Agrarian Reform';
-    if (upper.includes('GSIS')) return 'Government Service Insurance System';
-    return null;
+function cleanApplicationUrl(href) {
+    if (!href) return null;
+    try {
+        const urlObj = new URL(href);
+        ['fbclid', 'utm_source', 'utm_medium', 'utm_campaign'].forEach(p => urlObj.searchParams.delete(p));
+        return urlObj.toString();
+    } catch (e) {
+        return href.split('?')[0];
+    }
 }
 
-function createEmptyProgram(title, provider) {
-    return {
-        title: title,
-        provider: provider,
-        category: "scholarship",
-        description: "",
-        coverage: { type: "unknown", locations: [] },
-        eligibility: {
-            age: { min: null, max: null, raw_text: null },
-            education: { levels: [], raw_text: null },
-            employment: { statuses: [], raw_text: null },
-            income: { min: null, max: null, period: null, scope: null, raw_text: null },
-            residency: { locations: [], raw_text: null },
-            other_requirements: []
-        },
-        benefits: [],
-        requirements: [],
-        application: { start_date: null, deadline: null, process: null, url: null },
-        source: { url: source_url, last_verified_at: new Date().toISOString() },
-        status: "unknown",
-        _process_lines: []
-    };
+const adviceBlacklist = [
+    'prepare your documents', 'check if the', 'confirm that you',
+    'review the accepted', 'follow the correct', 'submit your application',
+    'keep a copy', 'check your email', 'apply early', 'read the official requirements',
+    'watch the video below', 'guide covers', 'this guide will help'
+];
+function isAdvice(text) {
+    return adviceBlacklist.some(p => text.toLowerCase().includes(p));
 }
 
-const programs = [];
 const contentNodes = $('.entry-content').children();
+let activeSection = "intro";
 
-let currentProgram = createEmptyProgram(pageTitle, extractProvider(pageTitle) || extractProvider($('body').text()));
-let activeSection = "description";
+let descriptionParts = [];
+let otherRequirements = [];
+let residencyRaw = null;
+let requirements = [];
+let benefits = [];
+let processSteps = [];
+let deadline = null;
+let applicationUrl = null;
+let currentStepHeader = null; 
+
+$('a').each((i, el) => {
+    const href = $(el).attr('href');
+    const text = $(el).text().toLowerCase();
+    if (href && !href.startsWith('#') && !applicationUrl) {
+        if (text.includes('access application') || text.includes('apply form') || text.includes('application portal') || href.includes('/apply/form') || href.includes('forms.gle')) {
+            applicationUrl = cleanApplicationUrl(href);
+        }
+    }
+});
 
 contentNodes.each((i, el) => {
     const tag = el.tagName.toUpperCase();
@@ -174,101 +158,118 @@ contentNodes.each((i, el) => {
     const textLower = text.toLowerCase();
 
     if (['H2', 'H3', 'H4'].includes(tag)) {
-        if (isGenuineProgramTitle(text)) {
-            if (currentProgram && (currentProgram.description || currentProgram.benefits.length > 0 || currentProgram.requirements.length > 0 || currentProgram.eligibility.other_requirements.length > 0)) {
-                programs.push(currentProgram);
-            }
-            
-            const cleanedTitle = text.replace(/^[0-9]+\.\s*/, '').trim();
-            currentProgram = createEmptyProgram(cleanedTitle, extractProvider(text) || currentProgram.provider);
-            activeSection = "description";
-        } else {
-            if (textLower.includes('qualification') || textLower.includes('who can apply') || textLower.includes('eligible')) activeSection = "eligibility";
-            else if (textLower.includes('requirement') || textLower.includes('document')) activeSection = "requirements";
-            else if (textLower.includes('benefit') || textLower.includes('coverage') || textLower.includes('privilege')) activeSection = "benefits";
-            else if (textLower.includes('apply') || textLower.includes('process') || textLower.includes('procedure')) activeSection = "process";
-            else if (textLower.includes('deadline')) activeSection = "deadline";
-            else if (textLower.includes('course') || textLower.includes('school') || textLower.includes('contact') || textLower.includes('about') || textLower.includes('overview') || textLower.includes('history') || textLower.includes('final thoughts')) activeSection = "ignore";
+        if (textLower.includes('qualification') || textLower.includes('eligible')) activeSection = "qualifications";
+        else if (textLower.includes('requirement') || textLower.includes('document')) activeSection = "requirements";
+        else if (textLower.includes('benefit')) activeSection = "benefits";
+        else if (textLower.includes('how to apply') || textLower.includes('process') || textLower.includes('step') || /^step\s*\d+/i.test(text)) {
+            activeSection = "process";
         }
-    } else if (currentProgram && activeSection !== "ignore") {
+        else if (textLower.includes('priority course') || textLower.includes('partner school') || textLower.includes('contact') || textLower.includes('about') || textLower.includes('final thoughts') || textLower.includes('reference')) activeSection = "ignore";
         
-        if (tag === 'P') {
-            if (isAdvice(text)) return;
-
-            const parsedDate = parseDate(text);
-            if (parsedDate && (textLower.includes('deadline') || activeSection === "deadline")) {
-                currentProgram.application.deadline = parsedDate;
-            }
-
-            const ageData = extractAge(text);
-            if (ageData.max !== null && currentProgram.eligibility.age.max === null) currentProgram.eligibility.age = ageData;
-
-            const incData = extractIncome(text);
-            if (incData.max !== null && currentProgram.eligibility.income.max === null) currentProgram.eligibility.income = incData;
-
-            const eduData = extractEducation(text);
-            if (eduData.levels.length > 0 && currentProgram.eligibility.education.levels.length === 0) currentProgram.eligibility.education = eduData;
-
-            if (activeSection === "description" || activeSection === "eligibility") {
-                if (!textLower.includes('view more details') && !textLower.includes('official link')) {
-                    currentProgram.description += (currentProgram.description ? " " : "") + text;
-                }
-            } else if (activeSection === "process") {
-                currentProgram._process_lines.push(text);
-            }
-
-            const href = $(el).find('a').attr('href');
-            if (href && !href.startsWith('#') && (textLower.includes('apply') || textLower.includes('portal') || textLower.includes('view more details'))) {
-                currentProgram.application.url = href;
-            }
-
-        } else if (tag === 'UL' || tag === 'OL') {
-            $(el).find('li').each((j, li) => {
-                const liText = $(li).clone().children('ul, ol').remove().end().text().trim();
-                
-                if (!liText || isAdvice(liText)) return;
-                if ($(li).find('a').length > 0) return; 
-
-                const parsedDate = parseDate(liText);
-                if (parsedDate && (liText.toLowerCase().includes('deadline') || activeSection === "deadline")) {
-                    currentProgram.application.deadline = parsedDate;
-                }
-
-                const isDocument = docRegex.test(liText);
-
-                if (activeSection === "benefits") {
-                    currentProgram.benefits.push(liText);
-                } else if (activeSection === "requirements" || activeSection === "eligibility") {
-                    if (isDocument) currentProgram.requirements.push(liText);
-                    else currentProgram.eligibility.other_requirements.push(liText);
-                } else {
-                    if (isDocument) currentProgram.requirements.push(liText);
-                    else currentProgram.eligibility.other_requirements.push(liText);
-                }
-            });
+        if (activeSection === "process" && /^step\s*\d+/i.test(text)) {
+            if (currentStepHeader) processSteps.push(currentStepHeader);
+            currentStepHeader = text; 
         }
+        return; 
+    }
+
+    if (activeSection === "ignore") return;
+
+    if (tag === 'P') {
+        if (isAdvice(text)) return;
+
+        const parsedDate = parseDate(text);
+        if (parsedDate && (textLower.includes('deadline') || activeSection === "deadline")) deadline = parsedDate;
+
+        if (activeSection === "intro") {
+            if (/supports academically deserving students/i.test(text) || /provides educational assistance/i.test(text) || /aims to help/i.test(text)) {
+                descriptionParts.push(text);
+            }
+        } else if (activeSection === "process") {
+            if (currentStepHeader) {
+                processSteps.push(`${currentStepHeader}\n${text}`);
+                currentStepHeader = null; 
+            } else if (/submit|portal|fill|upload/i.test(text)) {
+                processSteps.push(text);
+            }
+        }
+    } else if (tag === 'UL' || tag === 'OL') {
+        $(el).children('li').each((j, li) => {
+            const nestedList = $(li).children('ul, ol');
+            let liText;
+            
+            if (nestedList.length > 0) {
+                const parentText = $(li).clone().children('ul, ol').remove().end().text().trim().replace(/:$/, '');
+                const childItems = [];
+                nestedList.find('li').each((k, childLi) => childItems.push($(childLi).text().trim()));
+                
+                if (/whichever is applicable|either|or|any of the following/i.test(parentText)) {
+                    liText = `${parentText} (${childItems.join(', ')})`;
+                } else {
+                    liText = `${parentText}: ${childItems.join(', ')}`;
+                }
+            } else {
+                liText = $(li).text().trim();
+            }
+
+            if (!liText || isAdvice(liText)) return;
+            if ($(li).find('a').length > 0) return;
+
+            const parsedDate = parseDate(liText);
+            if (parsedDate && (liText.toLowerCase().includes('deadline') || activeSection === "deadline")) {
+                deadline = parsedDate;
+                return;
+            }
+
+            if (activeSection === "benefits") {
+                benefits.push(liText);
+            } else if (activeSection === "qualifications") {
+                if (/resident|residency|residing|township|project/i.test(liText)) residencyRaw = liText;
+                else if (!/income|gross|₱|php/i.test(liText)) otherRequirements.push(liText);
+            } else if (activeSection === "requirements") {
+                requirements.push(liText);
+            } else if (activeSection === "process") {
+                processSteps.push(liText);
+            }
+        });
     }
 });
 
-if (currentProgram && (currentProgram.description || currentProgram.benefits.length > 0 || currentProgram.requirements.length > 0 || currentProgram.eligibility.other_requirements.length > 0)) {
-    programs.push(currentProgram);
+if (currentStepHeader) processSteps.push(currentStepHeader);
+
+const verifiedTimestamp = new Date().toISOString();
+const fullBodyText = $('.entry-content').text() || pageText;
+
+let status = "unknown";
+if (pageTextLower.includes("applications ... are now open") || pageTextLower.includes("are now open") || pageTextLower.includes("accepting applications")) {
+    if (deadline && new Date(deadline) >= new Date()) status = "open";
+    else if (!deadline) status = "open";
 }
 
-programs.forEach(p => {
-    if (p._process_lines && p._process_lines.length > 0) {
-        p.application.process = p._process_lines.join("\n").substring(0, 800);
-    }
-    delete p._process_lines;
+const finalProgram = {
+    title: cleanTitle(rawTitle),
+    provider: extractProvider(rawTitle, pageText),
+    category: "scholarship",
+    description: descriptionParts.join(" ") || null,
+    coverage: { type: "unknown", locations: [] },
+    eligibility: {
+        age: extractAge(fullBodyText),
+        education: extractEducation(fullBodyText),
+        employment: { statuses: [], raw_text: null },
+        income: extractIncome(fullBodyText),
+        residency: { locations: [], raw_text: residencyRaw },
+        other_requirements: otherRequirements
+    },
+    benefits: [...new Set(benefits)],
+    requirements: [...new Set(requirements)],
+    application: {
+        start_date: null,
+        deadline: deadline,
+        process: processSteps.length > 0 ? processSteps.join("\n\n") : null,
+        url: applicationUrl
+    },
+    source: { url: source_url, last_verified_at: verifiedTimestamp },
+    status: status
+};
 
-    if (!p.description || p.description.trim() === "") p.description = null;
-    if (!p.application.process || p.application.process.trim() === "") p.application.process = null;
-    if (!p.application.url || p.application.url.trim() === "") p.application.url = null;
-
-    if (pageTextUpper.includes("FILIPINO CITIZEN") && !p.eligibility.other_requirements.includes("Must be a Filipino citizen.")) {
-        p.eligibility.other_requirements.unshift("Must be a Filipino citizen.");
-    }
-    
-    if (p.application.deadline === "Check official page") p.application.deadline = null; 
-});
-
-return programs;
+return [finalProgram];
