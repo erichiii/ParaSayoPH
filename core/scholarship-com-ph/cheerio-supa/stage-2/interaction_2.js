@@ -6,23 +6,47 @@ const domain = new URL(targetUrl).hostname.replace('www.', '');
 let configRules = null;
 
 if (supabaseUrl && supabaseKey) {
-    const endpoint = `${supabaseUrl}/rest/v1/scraper_configs?source_domain=eq.${domain}&is_active=eq.true&select=rules&limit=1`;
+    const https = require('https');
     
-    try {
-        const response = await fetch(endpoint, {
-            headers: {
-                "apikey": supabaseKey,
-                "Authorization": `Bearer ${supabaseKey}`
-            }
+    const fetchRules = () => {
+        return new Promise((resolve, reject) => {
+            const url = new URL(`${supabaseUrl}/rest/v1/scraper_configs?source_domain=eq.${domain}&is_active=eq.true&select=rules&limit=1`);
+            
+            const options = {
+                hostname: url.hostname,
+                path: url.pathname + url.search,
+                method: 'GET',
+                headers: {
+                    "apikey": supabaseKey,
+                    "Authorization": `Bearer ${supabaseKey}`
+                }
+            };
+
+            const req = https.request(options, (res) => {
+                let data = '';
+                res.on('data', (chunk) => data += chunk);
+                res.on('end', () => {
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        try {
+                            resolve(JSON.parse(data));
+                        } catch (e) {
+                            reject(e);
+                        }
+                    } else {
+                        reject(new Error(`HTTP Status ${res.statusCode}`));
+                    }
+                });
+            });
+            req.on('error', (e) => reject(e));
+            req.end();
         });
-        
-        if (response.ok) {
-            const data = await response.json();
-            if (data && data.length > 0) {
-                configRules = data[0].rules;
-            }
-        } else {
-            console.error(`Failed to fetch rules for ${domain}: ${response.status}`);
+    };
+
+    try {
+        const data = await fetchRules();
+        if (data && data.length > 0) {
+            configRules = data[0].rules;
+            console.log(`Successfully loaded rules for ${domain}`);
         }
     } catch (e) {
         console.error(`Network error fetching rules for ${domain}:`, e.message);

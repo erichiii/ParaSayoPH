@@ -19,7 +19,12 @@ else if (currentDepth === 2) {
     if (data.extraction_urls && data.extraction_urls.length > 0) {
         for (const url of data.extraction_urls) {
             console.log("Queuing for Stage 2 Extraction:", url);
-            next_stage({ url: url });
+
+            next_stage({ 
+                url: url,
+                supabase_url: input.supabase_url,
+                supabase_anon_key: input.supabase_anon_key
+            });
         }
     }
 }
