@@ -1,5 +1,5 @@
 /mirror
-.env.env
+.env
 .venv/
 about/
 requirements.txt
