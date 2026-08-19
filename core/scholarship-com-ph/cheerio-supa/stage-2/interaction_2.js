@@ -8,12 +8,15 @@ if (!input.rules) {
 navigate(targetUrl);
 
 const results = parse();
-
 const programs = Array.isArray(results) ? results : (results ? [results] : []);
-
 const validPrograms = programs.filter(p => 
     p && p.title && typeof p.title === 'string' && p.title.trim().length > 0
 );
+
+delete input.rules;
+delete input.supabase_url;
+delete input.supabase_anon_key;
+delete input.depth;
 
 if (validPrograms.length > 0) {
     collect(validPrograms);
