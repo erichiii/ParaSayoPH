@@ -1,4 +1,5 @@
-.env
+/mirror
+.env.env
 .venv/
 about/
 requirements.txt
