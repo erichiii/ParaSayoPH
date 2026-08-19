@@ -11,11 +11,16 @@ const rawTitle = input.title || $('h1.entry-title, h1.post-title, h1').first().t
 const pageText = $('body').text();
 const pageTextLower = pageText.toLowerCase();
 
+if (rules.blacklists && rules.blacklists.pages && containsAny(pageTextLower, rules.blacklists.pages)) {
+    return [];
+}
+
 function buildRegex(patternStr, flags) {
     return new RegExp(patternStr, flags);
 }
 
 function containsAny(text, keywordsArray) {
+    if (!text || !keywordsArray) return false;
     const lowerText = text.toLowerCase();
     return keywordsArray.some(kw => lowerText.includes(kw.toLowerCase()));
 }
@@ -31,7 +36,7 @@ function cleanTitle(text, rulesArray) {
 
 function extractProvider(title, text, providersMap) {
     const titleUpper = title.toUpperCase();
-    const textSnippet = text.substring(0, 500).toUpperCase();
+    const textSnippet = text.substring(0, 1000).toUpperCase();
     for (const [providerName, keywords] of Object.entries(providersMap)) {
         if (keywords.some(kw => titleUpper.includes(kw.toUpperCase()) || textSnippet.includes(kw.toUpperCase()))) {
             return providerName;
@@ -53,26 +58,33 @@ function parseDate(text, dateRules) {
     return null;
 }
 
+function tokenizeSentences(text) {
+    if (!text) return [];
+    return text.split(/\n+/).reduce((acc, line) => {
+        const sentences = line.match(/[^.!?]+[.!?]+(\s|$)/g) || [line];
+        return acc.concat(sentences.map(s => s.trim()).filter(s => s.length > 0));
+    }, []);
+}
+
 function extractAge(text, ageRules) {
-    const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+    const sentences = tokenizeSentences(text);
     const regex = buildRegex(ageRules.pattern, ageRules.flags);
     
     for (const sentence of sentences) {
         if (containsAny(sentence, ageRules.exclusions)) continue;
         const match = sentence.match(regex);
         if (match) {
-            const ageVal = parseInt(match[1] || match[2], 10);
+            const ageVal = parseInt(match[1] || match[2] || match[3], 10);
             if (!isNaN(ageVal) && ageVal >= 10 && ageVal <= 65) {
                 return { min: null, max: ageVal, raw_text: sentence.trim() };
             }
         }
     }
-
-    return null; 
+    return { min: null, max: null, raw_text: null };
 }
 
 function extractIncome(text, incomeRules) {
-    const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+    const sentences = tokenizeSentences(text);
     const regex = buildRegex(incomeRules.pattern, incomeRules.flags);
     
     for (const sentence of sentences) {
@@ -85,16 +97,20 @@ function extractIncome(text, incomeRules) {
                     for (const [scopeName, scopeKeywords] of Object.entries(incomeRules.scope_mapping)) {
                         if (containsAny(sentence, scopeKeywords)) scope = scopeName;
                     }
+                    
                     let period = "annual";
-                    for (const [periodName, periodKeywords] of Object.entries(incomeRules.period_mapping)) {
-                        if (containsAny(sentence, periodKeywords)) period = periodName;
+                    if (containsAny(sentence, incomeRules.period_mapping.annual)) {
+                        period = "annual";
+                    } else if (containsAny(sentence, incomeRules.period_mapping.monthly)) {
+                        period = "monthly";
                     }
-                    return { min: null, max: amount, period: period, scope: scope, raw_text: sentence.trim() };
+
+                    return { max: amount, period: period, scope: scope, raw_text: sentence.trim() };
                 }
             }
         }
     }
-    return { min: null, max: null, period: null, scope: null, raw_text: null };
+    return { max: null, period: null, scope: null, raw_text: null };
 }
 
 function extractEducation(text, eduRules) {
@@ -112,7 +128,7 @@ function extractEducation(text, eduRules) {
     }
     
     let raw_text = null;
-    const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+    const sentences = tokenizeSentences(text);
     const subjRegex = buildRegex(eduRules.raw_text_triggers.subject, eduRules.flags);
     const actRegex = buildRegex(eduRules.raw_text_triggers.action, eduRules.flags);
     
@@ -123,6 +139,27 @@ function extractEducation(text, eduRules) {
         }
     }
     return { levels: levels, raw_text: raw_text };
+}
+
+function extractCoverage(text, coverageRules) {
+    const locations = [];
+    if (!coverageRules || !coverageRules.locations) return { type: "unknown", locations: [] };
+    
+    for (const loc of coverageRules.locations) {
+        const regex = new RegExp(`\\b${loc}\\b`, 'i');
+        if (regex.test(text)) {
+            locations.push(loc);
+        }
+    }
+    
+    let type = "unknown";
+    if (locations.length > 0) {
+        type = "provincial";
+    } else if (text.toLowerCase().includes("nationwide") || text.toLowerCase().includes("philippines")) {
+        type = "nationwide";
+        locations.push("Philippines");
+    }
+    return { type: type, locations: [...new Set(locations)] };
 }
 
 function cleanApplicationUrl(href, paramsToRemove) {
@@ -188,7 +225,9 @@ $('.entry-content').children().each((i, el) => {
         if (containsAny(text, rules.blacklists.advice)) return;
 
         const parsedDate = parseDate(text, rules.extraction.date);
-        if (parsedDate && (textLower.includes('deadline') || activeSection === "deadline")) deadline = parsedDate;
+        if (parsedDate && (textLower.includes('deadline') || textLower.includes('application period') || activeSection === "deadline")) {
+            deadline = parsedDate;
+        }
 
         if (activeSection === "intro") {
             if (/supports academically deserving students|provides educational assistance|aims to help/i.test(text)) {
@@ -224,7 +263,7 @@ $('.entry-content').children().each((i, el) => {
             if ($(li).find('a').length > 0) return;
 
             const parsedDate = parseDate(liText, rules.extraction.date);
-            if (parsedDate && (liText.toLowerCase().includes('deadline') || activeSection === "deadline")) {
+            if (parsedDate && (liText.toLowerCase().includes('deadline') || liText.toLowerCase().includes('application period') || activeSection === "deadline")) {
                 deadline = parsedDate;
                 return;
             }
@@ -233,11 +272,31 @@ $('.entry-content').children().each((i, el) => {
                 benefits.push(liText);
             } else if (activeSection === "qualifications") {
                 if (/resident|residency|residing|township|project/i.test(liText)) residencyRaw = liText;
-                else if (!/income|gross|₱|php/i.test(liText)) otherRequirements.push(liText);
+                else if (!/income|gross|₱|php|\\$/i.test(liText)) otherRequirements.push(liText);
             } else if (activeSection === "requirements") {
                 requirements.push(liText);
             } else if (activeSection === "process") {
                 processSteps.push(liText);
+            }
+        });
+    }
+    else if (tag === 'TABLE') {
+        $(el).find('tr').each((j, tr) => {
+            const cells = $(tr).find('th, td').map((k, td) => $(td).text().trim()).get().filter(Boolean);
+            if (cells.length === 0) return;
+            const rowText = cells.join(': ');
+            if (containsAny(rowText, rules.blacklists.advice)) return;
+
+            const parsedDate = parseDate(rowText, rules.extraction.date);
+            if (parsedDate && (rowText.toLowerCase().includes('deadline') || rowText.toLowerCase().includes('application period') || activeSection === "deadline")) {
+                deadline = parsedDate;
+                return;
+            }
+
+            if (activeSection === "benefits") {
+                benefits.push(rowText);
+            } else if (activeSection === "requirements") {
+                requirements.push(rowText);
             }
         });
     }
@@ -249,9 +308,18 @@ const verifiedTimestamp = new Date().toISOString();
 const fullBodyText = $('.entry-content').text() || pageText;
 
 let status = "unknown";
-if (containsAny(pageTextLower, rules.status_evaluation.open)) {
-    if (deadline && new Date(deadline) >= new Date()) status = "open";
-    else if (!deadline) status = "open";
+if (containsAny(pageTextLower, rules.status_evaluation.closed)) {
+    status = "closed";
+} else if (containsAny(pageTextLower, rules.status_evaluation.open)) {
+    status = "open";
+}
+
+if (deadline) {
+    const dlDate = new Date(deadline);
+    dlDate.setHours(23, 59, 59, 999);
+    if (!isNaN(dlDate.getTime())) {
+        status = (new Date() > dlDate) ? "closed" : "open";
+    }
 }
 
 const finalProgram = {
@@ -259,11 +327,10 @@ const finalProgram = {
     provider: extractProvider(rawTitle, pageText, rules.providers),
     category: "scholarship",
     description: descriptionParts.join(" ") || null,
-    coverage: { type: "unknown", locations: [] },
+    coverage: extractCoverage(fullBodyText, rules.extraction.coverage),
     eligibility: {
-        age: extractAge(fullBodyText, rules.extraction.age),
         education: extractEducation(fullBodyText, rules.extraction.education),
-        employment: { statuses: [], raw_text: null },
+        employment: { statuses: [] },
         income: extractIncome(fullBodyText, rules.extraction.income),
         residency: { locations: [], raw_text: residencyRaw },
         other_requirements: otherRequirements
@@ -271,12 +338,13 @@ const finalProgram = {
     benefits: [...new Set(benefits)],
     requirements: [...new Set(requirements)],
     application: {
-        start_date: null,
-        deadline: deadline,
         process: processSteps.length > 0 ? processSteps.join("\n\n") : null,
         url: applicationUrl
     },
-    source: { url: source_url, last_verified_at: verifiedTimestamp },
+    source: { 
+        url: source_url, 
+        last_verified_at: verifiedTimestamp 
+    },
     status: status
 };
 
