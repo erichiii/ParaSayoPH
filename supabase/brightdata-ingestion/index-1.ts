@@ -6,6 +6,13 @@ serve(async (req) => {
     const payload = await req.json();
     const dataArray = Array.isArray(payload) ? payload : [payload];
     
+    if (dataArray.length === 0 || !dataArray[0].source) {
+       return new Response(
+         JSON.stringify({ message: "Webhook test successful." }),
+         { headers: { "Content-Type": "application/json" }, status: 200 }
+       );
+    }
+
     const cleanData = dataArray.map((item) => {
       if (item.input) delete item.input;
       if (item.source && item.source.url) item.source_url = item.source.url;
