@@ -36,6 +36,13 @@ VALID_COVERAGE_TYPES = {
     "unknown",
 }
 
+GENERIC_PROGRAM_TITLES = {
+    "scholarship.com.ph",
+    "scholarship programs",
+    "scholarship program",
+    "scholarships",
+    "home",
+}
 
 def _make_flag(
     field: str,
@@ -72,6 +79,47 @@ def _is_valid_url(value: Any) -> bool:
         and bool(parsed.netloc)
     )
 
+def _validate_title(
+    program: ProgramData,
+) -> list[dict[str, str]]:
+    """Detect titles that appear to be generic pages, not programs."""
+
+    flags: list[dict[str, str]] = []
+
+    normalized_title = program.title.strip().lower()
+
+    if normalized_title in GENERIC_PROGRAM_TITLES:
+        flags.append(
+            _make_flag(
+                field="title",
+                code="SUSPICIOUS",
+                severity="error",
+                reason=(
+                    "Title appears to describe a generic listing "
+                    "or website page rather than a specific program."
+                ),
+            )
+        )
+
+    return flags
+
+def _get_requirement_text(
+    eligibility: dict[str, Any],
+) -> str:
+    """
+    Combine extracted other requirements into searchable text.
+    """
+
+    requirements = eligibility.get("other_requirements")
+
+    if not isinstance(requirements, list):
+        return ""
+
+    return " ".join(
+        str(item)
+        for item in requirements
+        if item is not None
+    ).lower()
 
 def _validate_provider(
     program: ProgramData,
@@ -297,9 +345,36 @@ def _validate_age(
     flags: list[dict[str, str]] = []
 
     age = eligibility.get("age")
+    requirement_text = _get_requirement_text(eligibility)
 
-    # Missing age requirement is allowed.
+    age_patterns = [
+        r"\b\d{1,2}\s+years?\s+old\b",
+        r"\bnot\s+more\s+than\s+\d{1,2}\b",
+        r"\bno\s+more\s+than\s+\d{1,2}\b",
+        r"\bbelow\s+\d{1,2}\s+years?\b",
+        r"\bunder\s+\d{1,2}\s+years?\b",
+        r"\bage\s+(?:of\s+)?\d{1,2}\b",
+    ]
+
+    age_evidence_found = any(
+        re.search(pattern, requirement_text, re.IGNORECASE)
+        for pattern in age_patterns
+    )
+
     if age is None or age == {}:
+        if age_evidence_found:
+            flags.append(
+                _make_flag(
+                    field="eligibility.age",
+                    code="UNCERTAIN",
+                    reason=(
+                        "An age requirement appears in extracted "
+                        "eligibility text, but no structured age "
+                        "value was identified."
+                    ),
+                )
+            )
+
         return flags
 
     if not isinstance(age, dict):
@@ -388,7 +463,37 @@ def _validate_income(
     income = eligibility.get("income")
 
     # No explicit income requirement is acceptable.
+    requirement_text = _get_requirement_text(eligibility)
+
+    income_evidence_patterns = [
+        r"\bannual\s+(?:gross\s+)?(?:family|household|parent|parents')?\s*income\b",
+        r"\bmonthly\s+(?:gross\s+)?(?:family|household|parent|parents')?\s*income\b",
+        r"\bfamily\s+(?:gross\s+)?income\b",
+        r"\bhousehold\s+(?:gross\s+)?income\b",
+        r"\bparents?'?\s+(?:gross\s+)?income\b",
+        r"\bincome\s+(?:must\s+)?not\s+exceed\b",
+        r"\bincome\s+of\s+not\s+more\s+than\b",
+    ]
+
+    income_evidence_found = any(
+        re.search(pattern, requirement_text, re.IGNORECASE)
+        for pattern in income_evidence_patterns
+    )
+
     if income is None or income == {}:
+        if income_evidence_found:
+            flags.append(
+                _make_flag(
+                    field="eligibility.income",
+                    code="UNCERTAIN",
+                    reason=(
+                        "An income requirement appears in extracted "
+                        "eligibility text, but no structured income "
+                        "value was identified."
+                    ),
+                )
+            )
+
         return flags
 
     if not isinstance(income, dict):
@@ -702,6 +807,7 @@ def validate_program_fields(
 
     flags: list[dict[str, str]] = []
 
+    flags.extend(_validate_title(program))
     flags.extend(_validate_provider(program))
     flags.extend(_validate_description(program))
     flags.extend(_validate_source(program))
@@ -711,3 +817,4 @@ def validate_program_fields(
     flags.extend(_validate_eligibility(program))
 
     return flags
+
