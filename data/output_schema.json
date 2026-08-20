@@ -65,6 +65,10 @@
               "items": {
                 "type": "text"
               }
+            },
+            "raw_text": {
+              "type": "text",
+              "active": true
             }
           }
         },
@@ -72,6 +76,10 @@
           "type": "object",
           "active": true,
           "fields": {
+            "min": {
+              "type": "number",
+              "active": true
+            },
             "max": {
               "type": "number",
               "active": true
@@ -113,6 +121,48 @@
           "items": {
             "type": "text"
           }
+        },
+        "age": {
+          "type": "object",
+          "active": true,
+          "fields": {
+            "min": {
+              "type": "number",
+              "active": true
+            },
+            "max": {
+              "type": "number",
+              "active": true
+            },
+            "raw_text": {
+              "type": "text",
+              "active": true
+            }
+          }
+        },
+        "fields": {
+          "type": "object",
+          "active": true,
+          "fields": {
+            "categories": {
+              "type": "array",
+              "active": true,
+              "items": {
+                "type": "text"
+              }
+            },
+            "programs": {
+              "type": "array",
+              "active": true,
+              "items": {
+                "type": "text"
+              }
+            },
+            "raw_text": {
+              "type": "text",
+              "active": true
+            }
+          }
         }
       }
     },
@@ -134,6 +184,14 @@
       "type": "object",
       "active": true,
       "fields": {
+        "start_date": {
+          "type": "text",
+          "active": true
+        },
+        "deadline": {
+          "type": "text",
+          "active": true
+        },
         "process": {
           "type": "text",
           "active": true

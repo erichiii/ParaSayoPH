@@ -14,7 +14,10 @@ if (depth === 1) {
 else if (depth === 2) {
     $('.entry-content a').each((i, el) => {
         let url = $(el).attr('href');
+        
         if (url && url.includes('scholarship.com.ph') && 
+            !url.includes('mailto:') &&
+            !url.includes('tel:') &&
             !url.includes('/category/') && 
             !url.includes('/author/') && 
             !url.includes('/page/') &&

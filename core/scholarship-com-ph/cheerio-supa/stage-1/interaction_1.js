@@ -1,12 +1,13 @@
 const currentDepth = input.depth || 1;
+const currentPage = input.current_page || 1;
+const maxPages = input.max_pages || 999;
 
 function buildPayload(targetUrl, targetDepth) {
     return {
         url: targetUrl,
         depth: targetDepth,
-        supabase_url: input.supabase_url,
-        supabase_anon_key: input.supabase_anon_key,
-        rules: input.rules 
+        rules: input.rules,
+        max_pages: maxPages
     };
 }
 
@@ -20,10 +21,14 @@ navigate(input.url || "https://scholarship.com.ph/");
 const data = parse();
 
 if (currentDepth === 1) {
-    if (data.next_page) {
+    if (data.next_page && currentPage < maxPages) {
         console.log("Next page found:", data.next_page);
-        rerun_stage(buildPayload(data.next_page, 1));
+        const nextPayload = buildPayload(data.next_page, 1);
+        
+        nextPayload.current_page = currentPage + 1; 
+        rerun_stage(nextPayload);
     }
+    
     if (data.depth_2_urls && data.depth_2_urls.length > 0) {
         for (const url of data.depth_2_urls) {
             rerun_stage(buildPayload(url, 2));
