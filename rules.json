@@ -45,6 +45,11 @@
         "replacement": "Megaworld"
       },
       {
+        "pattern": "20\\d{2}[–-]20\\d{2}",
+        "flags": "g",
+        "replacement": ""
+      },
+      {
         "pattern": "\\b(Application Guide|Comprehensive Guide|Application Process|Guide|Philippines|Online Form|Details|Overview)\\b",
         "flags": "gi",
         "replacement": ""
@@ -52,191 +57,49 @@
     ]
   },
   "providers": {
-    "Commission on Higher Education": [
-      "CHED",
-      "COMMISSION ON HIGHER EDUCATION",
-      "UNIFAST"
-    ],
-    "Department of Science and Technology": [
-      "DOST",
-      "SCIENCE AND TECHNOLOGY",
-      "DOST-SEI"
-    ],
-    "Bureau of Fisheries and Aquatic Resources": [
-      "BFAR",
-      "BUREAU OF FISHERIES AND AQUATIC RESOURCES"
-    ],
-    "Overseas Workers Welfare Administration": [
-      "OWWA",
-      "OVERSEAS WORKERS WELFARE ADMINISTRATION"
-    ],
-    "Government Service Insurance System": [
-      "GSIS",
-      "GOVERNMENT SERVICE INSURANCE SYSTEM"
-    ],
-    "Land Bank of the Philippines": [
-      "LANDBANK",
-      "LAND BANK",
-      "LCDFI"
-    ],
-    "National Commission on Indigenous Peoples": [
-      "NCIP",
-      "NATIONAL COMMISSION ON INDIGENOUS PEOPLES"
-    ],
-    "Sugar Regulatory Administration": [
-      "SUGAR REGULATORY ADMINISTRATION",
-      "SRA"
-    ],
-    "Iloilo Provincial Government": [
-      "ILOILO PROVINCIAL GOVERNMENT",
-      "ISKOLAR SANG ILOILO",
-      "ISIP"
-    ],
-    "Quezon City Government": [
-      "QUEZON CITY GOVERNMENT",
-      "QCYDO",
-      "QUEZON CITY YOUTH DEVELOPMENT"
-    ],
-    "Cebu Provincial Government": [
-      "CEBU PROVINCIAL GOVERNMENT",
-      "CP-GIFTS"
-    ],
-    "Megaworld Foundation, Inc.": [
-      "MEGAWORLD FOUNDATION",
-      "MEGAWORLD"
-    ],
-    "Gokongwei Brothers Foundation": [
-      "GOKONGWEI BROTHERS FOUNDATION",
-      "GBF"
-    ],
-    "Security Bank Foundation, Inc.": [
-      "SECURITY BANK FOUNDATION",
-      "SECURITY BANK",
-      "SBFI"
-    ],
-    "SM Foundation, Inc.": [
-      "SM FOUNDATION"
-    ],
-    "Ayala Foundation, Inc.": [
-      "AYALA FOUNDATION"
-    ],
-    "BPI Foundation, Inc.": [
-      "BPI FOUNDATION",
-      "BPI PAGPUPUGAY"
-    ],
-    "GT Foundation, Inc.": [
-      "GT FOUNDATION",
-      "GT-YES",
-      "GT-REAP"
-    ],
-    "Vicsal Foundation, Inc.": [
-      "VICSAL FOUNDATION",
-      "VSF"
-    ],
-    "Mercury Drug Foundation, Inc.": [
-      "MERCURY DRUG FOUNDATION",
-      "MDFI",
-      "GAWAD TALINO"
-    ],
-    "Cebuana Lhuillier Foundation, Inc.": [
-      "CEBUANA LHUILLIER FOUNDATION",
-      "CEBUANA LHUILLIER",
-      "CLFI"
-    ],
-    "Palawan Group of Companies": [
-      "PALAWAN GROUP OF COMPANIES",
-      "PALAWAN PAWNSHOP",
-      "PALAWAN SCHOLARSHIP"
-    ],
-    "Palawan Electric Cooperative": [
-      "PALAWAN ELECTRIC COOPERATIVE",
-      "PALECO"
-    ],
-    "Tagum Cooperative": [
-      "TAGUM COOPERATIVE"
-    ],
-    "Davao City Water District": [
-      "DAVAO CITY WATER DISTRICT",
-      "DCWD"
-    ],
-    "Philippine Army Finance Center Producers Integrated Cooperative": [
-      "PAFCPIC",
-      "PHILIPPINE ARMY FINANCE CENTER"
-    ],
-    "Development Bank of the Philippines": [
-      "DEVELOPMENT BANK OF THE PHILIPPINES",
-      "DBP INSPIRE",
-      "DBP"
-    ],
-    "Andres P. Tamayo Sr. Foundation, Inc.": [
-      "ANDRES P. TAMAYO SR. FOUNDATION",
-      "APTSFI"
-    ],
-    "InLife Foundation": [
-      "INLIFE FOUNDATION",
-      "INSULAR LIFE FOUNDATION",
-      "GOLD EAGLE"
-    ],
-    "Vivant Foundation, Inc.": [
-      "VIVANT FOUNDATION",
-      "VIVANT STEM"
-    ],
-    "KCC Foundation, Inc.": [
-      "KCC FOUNDATION",
-      "KCCFI"
-    ],
-    "Pinas Cargo": [
-      "PINAS CARGO"
-    ],
-    "Toyota Motor Philippines School of Technology": [
-      "TOYOTA MOTOR PHILIPPINES",
-      "TMP TECH",
-      "TOYOTA SCHOLARSHIP"
-    ],
-    "Del Monte Foundation, Inc.": [
-      "DEL MONTE FOUNDATION",
-      "DMFI"
-    ],
-    "Dowell Appliances Philippines": [
-      "DOWELL APPLIANCES",
-      "DOWELL SCHOLARSHIP",
-      "DOWELL"
-    ],
-    "Peace Corps Alumni Foundation for Philippine Development": [
-      "PCAFPD",
-      "PEACE CORPS ALUMNI FOUNDATION"
-    ],
-    "Moirasia Foundation, Inc.": [
-      "MOIRASIA FOUNDATION",
-      "MOIRASIA YOUTH EXCELLENCE",
-      "MYES"
-    ],
-    "Grab": [
-      "GRAB",
-      "GRABSCHOLAR"
-    ],
-    "Ministry of Education, Culture, Sports, Science and Technology": [
-      "MEXT",
-      "MONBUKAGAKUSHO"
-    ],
-    "Embassy of Japan in the Philippines": [
-      "EMBASSY OF JAPAN IN THE PHILIPPINES",
-      "EMBASSY OF JAPAN"
-    ],
-    "Fulbright Philippines": [
-      "FULBRIGHT PHILIPPINES",
-      "PHILIPPINE-AMERICAN EDUCATIONAL FOUNDATION",
-      "PAEF",
-      "FULBRIGHT"
-    ],
-    "Griffith University": [
-      "GRIFFITH UNIVERSITY",
-      "GRIFFITH COLLEGE",
-      "GELI"
-    ],
-    "Chulalongkorn University": [
-      "CHULALONGKORN UNIVERSITY"
-    ]
+    "Commission on Higher Education": ["CHED", "COMMISSION ON HIGHER EDUCATION", "UNIFAST"],
+    "Department of Science and Technology": ["DOST", "SCIENCE AND TECHNOLOGY", "DOST-SEI"],
+    "Bureau of Fisheries and Aquatic Resources": ["BFAR", "BUREAU OF FISHERIES AND AQUATIC RESOURCES"],
+    "Overseas Workers Welfare Administration": ["OWWA", "OVERSEAS WORKERS WELFARE ADMINISTRATION"],
+    "Government Service Insurance System": ["GSIS", "GOVERNMENT SERVICE INSURANCE SYSTEM"],
+    "Land Bank of the Philippines": ["LANDBANK", "LAND BANK", "LCDFI"],
+    "National Commission on Indigenous Peoples": ["NCIP", "NATIONAL COMMISSION ON INDIGENOUS PEOPLES"],
+    "Sugar Regulatory Administration": ["SUGAR REGULATORY ADMINISTRATION", "SRA"],
+    "Iloilo Provincial Government": ["ILOILO PROVINCIAL GOVERNMENT", "ISKOLAR SANG ILOILO", "ISIP"],
+    "Quezon City Government": ["QUEZON CITY GOVERNMENT", "QCYDO", "QUEZON CITY YOUTH DEVELOPMENT"],
+    "Cebu Provincial Government": ["CEBU PROVINCIAL GOVERNMENT", "CP-GIFTS"],
+    "Megaworld Foundation, Inc.": ["MEGAWORLD FOUNDATION", "MEGAWORLD", "MEGA WORLD"],
+    "Gokongwei Brothers Foundation": ["GOKONGWEI BROTHERS FOUNDATION", "GBF"],
+    "Security Bank Foundation, Inc.": ["SECURITY BANK FOUNDATION", "SECURITY BANK", "SBFI"],
+    "SM Foundation, Inc.": ["SM FOUNDATION"],
+    "Ayala Foundation, Inc.": ["AYALA FOUNDATION"],
+    "BPI Foundation, Inc.": ["BPI FOUNDATION", "BPI PAGPUPUGAY"],
+    "GT Foundation, Inc.": ["GT FOUNDATION", "GT-YES", "GT-REAP"],
+    "Vicsal Foundation, Inc.": ["VICSAL FOUNDATION", "VSF"],
+    "Mercury Drug Foundation, Inc.": ["MERCURY DRUG FOUNDATION", "MDFI", "GAWAD TALINO"],
+    "Cebuana Lhuillier Foundation, Inc.": ["CEBUANA LHUILLIER FOUNDATION", "CEBUANA LHUILLIER", "CLFI"],
+    "Palawan Group of Companies": ["PALAWAN GROUP OF COMPANIES", "PALAWAN PAWNSHOP", "PALAWAN SCHOLARSHIP"],
+    "Palawan Electric Cooperative": ["PALAWAN ELECTRIC COOPERATIVE", "PALECO"],
+    "Tagum Cooperative": ["TAGUM COOPERATIVE"],
+    "Davao City Water District": ["DAVAO CITY WATER DISTRICT", "DCWD"],
+    "Philippine Army Finance Center Producers Integrated Cooperative": ["PAFCPIC", "PHILIPPINE ARMY FINANCE CENTER"],
+    "Development Bank of the Philippines": ["DEVELOPMENT BANK OF THE PHILIPPINES", "DBP INSPIRE", "DBP"],
+    "Andres P. Tamayo Sr. Foundation, Inc.": ["ANDRES P. TAMAYO SR. FOUNDATION", "APTSFI"],
+    "InLife Foundation": ["INLIFE FOUNDATION", "INSULAR LIFE FOUNDATION", "GOLD EAGLE"],
+    "Vivant Foundation, Inc.": ["VIVANT FOUNDATION", "VIVANT STEM"],
+    "KCC Foundation, Inc.": ["KCC FOUNDATION", "KCCFI"],
+    "Pinas Cargo": ["PINAS CARGO"],
+    "Toyota Motor Philippines School of Technology": ["TOYOTA MOTOR PHILIPPINES", "TMP TECH", "TOYOTA SCHOLARSHIP"],
+    "Del Monte Foundation, Inc.": ["DEL MONTE FOUNDATION", "DMFI"],
+    "Dowell Appliances Philippines": ["DOWELL APPLIANCES", "DOWELL SCHOLARSHIP", "DOWELL"],
+    "Peace Corps Alumni Foundation for Philippine Development": ["PCAFPD", "PEACE CORPS ALUMNI FOUNDATION"],
+    "Moirasia Foundation, Inc.": ["MOIRASIA FOUNDATION", "MOIRASIA YOUTH EXCELLENCE", "MYES"],
+    "Grab": ["GRAB", "GRABSCHOLAR"],
+    "Ministry of Education, Culture, Sports, Science and Technology": ["MEXT", "MONBUKAGAKUSHO"],
+    "Embassy of Japan in the Philippines": ["EMBASSY OF JAPAN IN THE PHILIPPINES", "EMBASSY OF JAPAN"],
+    "Fulbright Philippines": ["FULBRIGHT PHILIPPINES", "PHILIPPINE-AMERICAN EDUCATIONAL FOUNDATION", "PAEF", "FULBRIGHT"],
+    "Griffith University": ["GRIFFITH UNIVERSITY", "GRIFFITH COLLEGE", "GELI"],
+    "Chulalongkorn University": ["CHULALONGKORN UNIVERSITY"]
   },
   "extraction": {
     "date": {
@@ -265,7 +128,7 @@
         "individual": ["individual", "personal"]
       },
       "period_mapping": {
-        "annual": ["annual", "yearly", "per year", "per annum"],
+        "annual": ["annual", "yearly", "per year", "per annum", "year"],
         "monthly": ["monthly", "per month", "month"]
       }
     },
@@ -285,6 +148,69 @@
         "action": "cover|open|support|eligib|enrolled|pursu"
       }
     },
+    "fields_of_study": {
+      "technology": {
+        "computer_science": ["\\b(?:BS\\s*)?Computer Science\\b", "\\bCS\\b"],
+        "information_technology": ["\\b(?:BS\\s*)?Information Technology\\b", "\\bIT\\b"],
+        "information_systems": ["\\b(?:BS\\s*)?Information Systems\\b", "\\bIS\\b"],
+        "computer_applications": ["\\b(?:BS\\s*)?Computer Applications\\b"],
+        "computer_engineering": ["\\b(?:BS\\s*)?Computer Engineering\\b", "\\bCpE\\b"],
+        "data_science": ["\\b(?:BS\\s*)?Data Science\\b"],
+        "software_engineering": ["\\b(?:BS\\s*)?Software Engineering\\b"]
+      },
+      "engineering": {
+        "civil_engineering": ["\\b(?:BS\\s*)?Civil Engineering\\b", "\\bCE\\b"],
+        "mechanical_engineering": ["\\b(?:BS\\s*)?Mechanical Engineering\\b", "\\bME\\b"],
+        "electrical_engineering": ["\\b(?:BS\\s*)?Electrical Engineering\\b", "\\bEE\\b"],
+        "chemical_engineering": ["\\b(?:BS\\s*)?Chemical Engineering\\b", "\\bChE\\b"],
+        "industrial_engineering": ["\\b(?:BS\\s*)?Industrial Engineering\\b", "\\bIE\\b"],
+        "electronics_engineering": ["\\b(?:BS\\s*)?Electronics(?: and Communications)? Engineering\\b", "\\bECE\\b"]
+      },
+      "health_sciences": {
+        "nursing": ["\\b(?:BS\\s*)?Nursing\\b", "\\bBSN\\b"],
+        "pharmacy": ["\\b(?:BS\\s*)?Pharmacy\\b"],
+        "medical_technology": ["\\b(?:BS\\s*)?Medical Technology\\b", "\\bMedTech\\b"],
+        "physical_therapy": ["\\b(?:BS\\s*)?Physical Therapy\\b", "\\bPT\\b"],
+        "radiologic_technology": ["\\b(?:BS\\s*)?Radiologic Technology\\b", "\\bRadTech\\b"],
+        "medicine": ["\\bMedicine\\b", "\\bMD\\b"]
+      },
+      "business_management": {
+        "accountancy": ["\\b(?:BS\\s*)?Accountancy\\b", "\\bBSA\\b", "\\bAccounting\\b"],
+        "business_administration": ["\\b(?:BS\\s*)?Business Administration\\b", "\\bBSBA\\b"],
+        "finance": ["\\b(?:BS\\s*)?Finance\\b"],
+        "marketing": ["\\b(?:BS\\s*)?Marketing\\b"],
+        "management_accounting": ["\\b(?:BS\\s*)?Management Accounting\\b"],
+        "entrepreneurship": ["\\b(?:BS\\s*)?Entrepreneurship\\b"],
+        "hospitality_management": ["\\b(?:BS\\s*)?Hospitality Management\\b"]
+      },
+      "natural_sciences_math": {
+        "biology": ["\\b(?:BS\\s*)?Biology\\b"],
+        "chemistry": ["\\b(?:BS\\s*)?Chemistry\\b"],
+        "physics": ["\\b(?:BS\\s*)?Physics\\b"],
+        "mathematics": ["\\b(?:BS\\s*)?Mathematics\\b", "\\bApplied Math(?:ematics)?\\b"],
+        "statistics": ["\\b(?:BS\\s*)?Statistics\\b"],
+        "environmental_science": ["\\b(?:BS\\s*)?Environmental Science\\b"]
+      },
+      "education": {
+        "elementary_education": ["\\b(?:Bachelor of|BEEd)?\\s*Elementary Education\\b"],
+        "secondary_education": ["\\b(?:Bachelor of|BSEd)?\\s*Secondary Education\\b"],
+        "special_needs_education": ["\\b(?:Bachelor of|BEd)?\\s*Special Needs Education\\b"]
+      },
+      "agriculture_fisheries": {
+        "agriculture": ["\\b(?:BS\\s*)?Agriculture\\b"],
+        "fisheries": ["\\b(?:BS\\s*)?Fisheries\\b"],
+        "forestry": ["\\b(?:BS\\s*)?Forestry\\b"],
+        "agricultural_engineering": ["\\b(?:BS\\s*)?Agricultural and Biosystems Engineering\\b"]
+      },
+      "social_sciences_law": {
+        "psychology": ["\\b(?:BS|BA\\s*)?Psychology\\b"],
+        "political_science": ["\\b(?:BS|BA\\s*)?Political Science\\b"],
+        "criminology": ["\\b(?:BS|BA\\s*)?Criminology\\b"],
+        "communication": ["\\b(?:BS|BA\\s*)?Communication\\b"],
+        "legal_management": ["\\b(?:BS|BA\\s*)?Legal Management\\b"],
+        "law": ["\\bLaw\\b", "\\bJuris Doctor\\b"]
+      }
+    },
     "coverage": {
       "locations": [
         "Iloilo",
@@ -300,7 +226,15 @@
         "Mountain Province",
         "Negros Occidental",
         "Baguio"
-      ]
+      ],
+      "nationwide_keywords": ["nationwide", "philippines"]
+    },
+    "residency": {
+      "raw_triggers": "resident|residency|residing|township|project"
+    },
+    "other_requirements": {
+      "income_exclusions": "income|gross|₱|php|\\$",
+      "mixed_conditions": "grade|gpa|average|citizen|moral|health|exam|score"
     }
   },
   "dom_traversal": {
@@ -310,13 +244,18 @@
       "benefits": ["benefit", "scholarship package", "grant details", "financial assistance"],
       "process": ["how to apply", "application process", "step-by-step", "steps to apply", "application procedure"],
       "deadline": ["deadline", "timeline", "important dates", "schedule", "application period", "application status"],
+      "fields": [
+        "priority course", 
+        "priority courses", 
+        "fields of study", 
+        "field of study", 
+        "accepted courses", 
+        "eligible courses", 
+        "degree program", 
+        "academic program", 
+        "courses available"
+      ],
       "ignore": [
-        "priority course",
-        "priority courses",
-        "fields of study",
-        "field of study",
-        "accepted courses",
-        "eligible courses",
         "partner school",
         "partner schools",
         "partner institutions",
@@ -357,7 +296,11 @@
       "bpms.ched.gov.ph",
       "science-scholarships.ph",
       "scholarship.owwa.gov.ph"
-    ]
+    ],
+    "step_pattern": "^step\\s*\\d+",
+    "intro_triggers": "supports academically deserving students|provides educational assistance|aims to help",
+    "process_action_keywords": ["submit", "portal", "fill", "upload"],
+    "nested_list_keywords": "whichever is applicable|either|or|any of the following"
   },
   "status_evaluation": {
     "open": [
@@ -375,7 +318,10 @@
       "is currently closed",
       "is closed",
       "closed for the latest",
-      "now closed"
+      "now closed",
+      "deadline has passed",
+      "applications are now closed",
+      "no longer accepting"
     ]
   }
 }

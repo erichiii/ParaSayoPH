@@ -1,0 +1,218 @@
+{
+    "table": "staging_scraper",
+    "schema": "public",
+    "columns": [
+        {
+            "comment": null,
+            "data_type": "bigint",
+            "column_name": "id",
+            "is_identity": true,
+            "is_nullable": false,
+            "identity_type": "ALWAYS",
+            "column_default": null
+        },
+        {
+            "comment": "Top-level unique extraction URL used as the conflict target for idempotent upserts.",
+            "data_type": "text",
+            "column_name": "source_url",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": null
+        },
+        {
+            "comment": null,
+            "data_type": "text",
+            "column_name": "title",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": null
+        },
+        {
+            "comment": null,
+            "data_type": "text",
+            "column_name": "provider",
+            "is_identity": false,
+            "is_nullable": true,
+            "identity_type": null,
+            "column_default": null
+        },
+        {
+            "comment": null,
+            "data_type": "text",
+            "column_name": "category",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'scholarship'::text"
+        },
+        {
+            "comment": null,
+            "data_type": "text",
+            "column_name": "description",
+            "is_identity": false,
+            "is_nullable": true,
+            "identity_type": null,
+            "column_default": null
+        },
+        {
+            "comment": null,
+            "data_type": "text",
+            "column_name": "status",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'unknown'::text"
+        },
+        {
+            "comment": null,
+            "data_type": "jsonb",
+            "column_name": "coverage",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'{}'::jsonb"
+        },
+        {
+            "comment": null,
+            "data_type": "jsonb",
+            "column_name": "eligibility",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'{}'::jsonb"
+        },
+        {
+            "comment": null,
+            "data_type": "jsonb",
+            "column_name": "benefits",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'[]'::jsonb"
+        },
+        {
+            "comment": null,
+            "data_type": "jsonb",
+            "column_name": "requirements",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'[]'::jsonb"
+        },
+        {
+            "comment": null,
+            "data_type": "jsonb",
+            "column_name": "application",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'{}'::jsonb"
+        },
+        {
+            "comment": null,
+            "data_type": "jsonb",
+            "column_name": "source",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'{}'::jsonb"
+        },
+        {
+            "comment": "Tracks backend handoff status: pending, migrated, or ignored.",
+            "data_type": "text",
+            "column_name": "migration_status",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'pending'::text"
+        },
+        {
+            "comment": null,
+            "data_type": "timestamp with time zone",
+            "column_name": "first_seen_at",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "now()"
+        },
+        {
+            "comment": null,
+            "data_type": "timestamp with time zone",
+            "column_name": "last_scraped_at",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "now()"
+        },
+        {
+            "comment": null,
+            "data_type": "jsonb",
+            "column_name": "field_flags",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'[]'::jsonb"
+        },
+        {
+            "comment": null,
+            "data_type": "text",
+            "column_name": "migration_error",
+            "is_identity": false,
+            "is_nullable": true,
+            "identity_type": null,
+            "column_default": null
+        }
+    ],
+    "comment": "Dedicated staging table for raw, automated Bright Data scraper ingestion.",
+    "indexes": [
+        {
+            "is_unique": true,
+            "definition": "CREATE UNIQUE INDEX staging_scraper_pkey ON public.staging_scraper USING btree (id)",
+            "index_name": "staging_scraper_pkey",
+            "is_primary": true
+        },
+        {
+            "is_unique": true,
+            "definition": "CREATE UNIQUE INDEX staging_scraper_source_url_key ON public.staging_scraper USING btree (source_url)",
+            "index_name": "staging_scraper_source_url_key",
+            "is_primary": false
+        },
+        {
+            "is_unique": false,
+            "definition": "CREATE INDEX idx_staging_scraper_source_url ON public.staging_scraper USING btree (source_url)",
+            "index_name": "idx_staging_scraper_source_url",
+            "is_primary": false
+        },
+        {
+            "is_unique": false,
+            "definition": "CREATE INDEX idx_staging_scraper_migration_status ON public.staging_scraper USING btree (migration_status)",
+            "index_name": "idx_staging_scraper_migration_status",
+            "is_primary": false
+        },
+        {
+            "is_unique": false,
+            "definition": "CREATE INDEX idx_staging_scraper_status ON public.staging_scraper USING btree (status)",
+            "index_name": "idx_staging_scraper_status",
+            "is_primary": false
+        }
+    ],
+    "constraints": [
+        {
+            "definition": "PRIMARY KEY (id)",
+            "constraint_name": "staging_scraper_pkey",
+            "constraint_type": "PRIMARY KEY"
+        },
+        {
+            "definition": "UNIQUE (source_url)",
+            "constraint_name": "staging_scraper_source_url_key",
+            "constraint_type": "UNIQUE"
+        },
+        {
+            "definition": "CHECK (migration_status = ANY (ARRAY['pending'::text, 'migrated'::text, 'needs_review'::text, 'failed'::text, 'duplicate'::text, 'ignored'::text]))",
+            "constraint_name": "valid_staging_migration_status",
+            "constraint_type": "CHECK"
+        }
+    ]
+}

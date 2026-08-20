@@ -6,7 +6,8 @@ serve(async (req) => {
   const maxPages = mode === "delta" ? 2 : 999; 
   const apiToken = Deno.env.get("BRIGHTDATA_API_TOKEN");
   const collectorId = Deno.env.get("COLLECTOR_ID");
-  const triggerUrl = `https://api.brightdata.com/dca/trigger?collector=${collectorId}&queue_next=1`;
+  
+  const triggerUrl = `https://api.brightdata.com/dca/trigger?collector=${collectorId}&queue_next=1&override_incompatible_schema=1`;
 
   const payload = [{
     url: "https://scholarship.com.ph/",
