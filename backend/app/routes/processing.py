@@ -14,7 +14,8 @@ router = APIRouter(
 
 class ProcessResponse(BaseModel):
     records_checked: int
-    processed: int
+    inserted: int
+    updated: int
     duplicates: int
     needs_review: int
     failed: int
@@ -26,6 +27,17 @@ class ProcessResponse(BaseModel):
     status_code=status.HTTP_200_OK,
 )
 def process() -> ProcessResponse:
+    """
+    Process all pending records from staging_scraper.
+
+    Records are validated and then either:
+    - inserted into programs,
+    - updated in programs,
+    - marked as duplicate,
+    - marked as needs_review,
+    - or marked as failed.
+    """
+
     try:
         result = process_pending_records()
 
