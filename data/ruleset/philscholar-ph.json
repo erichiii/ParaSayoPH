@@ -1,5 +1,5 @@
 {
-    "id": "fa8e47ca-7c2e-4f38-929d-f18073fcd0c9",
+    "id": "9a94b267-f0ca-40b6-84aa-19dfa1ef26d2",
     "rules": {
         "cleaning": {
             "title": [
@@ -544,6 +544,7 @@
         "dom_traversal": {
             "step_pattern": "^step\\s*\\d+",
             "intro_triggers": "supports academically deserving students|provides educational assistance|aims to help",
+            "content_wrapper": ".entry-content",
             "section_triggers": {
                 "fields": [
                     "priority course",
@@ -639,6 +640,36 @@
                 "scholarship.owwa.gov.ph"
             ]
         },
+        "crawler_config": {
+            "depth_1": {
+                "filters": {
+                    "must_exclude": [
+                        "mailto:",
+                        "tel:",
+                        "/category/",
+                        "/author/",
+                        "/page/",
+                        "about",
+                        "contact"
+                    ]
+                },
+                "link_attribute": "href",
+                "list_selectors": [
+                    "h2.wp-block-post-title a",
+                    "article h2.entry-title a",
+                    "article h3.entry-title a",
+                    "main article h2 a",
+                    ".post-title a"
+                ],
+                "pagination_selectors": [
+                    "a.wp-block-query-pagination-next",
+                    "link[rel=\"next\"]",
+                    "a.next.page-numbers"
+                ]
+            },
+            "start_url": "https://philscholar.com/category/scholarship-programs/",
+            "target_depth": 2
+        },
         "status_evaluation": {
             "open": [
                 "applications ... are now open",
@@ -670,7 +701,7 @@
     },
     "version": "1.0.0",
     "is_active": true,
-    "created_at": "2026-08-18T12:27:54.013643+00:00",
-    "updated_at": "2026-08-20T11:56:44.986091+00:00",
-    "source_domain": "scholarship.com.ph"
+    "created_at": "2026-08-20T17:18:17.280025+00:00",
+    "updated_at": "2026-08-20T17:57:21.079674+00:00",
+    "source_domain": "philscholar.com"
 }
