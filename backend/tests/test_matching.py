@@ -1,5 +1,6 @@
 from app.schemas.matching import (
     MatchStatus,
+    ProgramMatchStatus,
     UserProfile,
 )
 
@@ -1081,8 +1082,8 @@ def test_interest_not_provided():
 
 def test_match_program_eligible():
     """
-    Program contains only requirements that can be
-    deterministically verified.
+    Program contains explicit requirements that can all
+    be deterministically verified.
     """
 
     user = UserProfile(
@@ -1090,16 +1091,30 @@ def test_match_program_eligible():
         location="Manila",
         education_level="second_year_college",
         field_of_study="information_technology",
+
         income=300000,
         income_period="annual",
         income_scope="family",
-        preferred_categories=["scholarship"],
-        interests=["technology"],
+
+        preferred_categories=[
+            "scholarship"
+        ],
+
+        interests=[
+            "technology"
+        ],
     )
 
     program = {
         "id": 1,
+
+        "title": "Test Technology Scholarship",
+
+        "provider": "Test Foundation",
+
         "category": "scholarship",
+
+        "status": "open",
 
         "coverage": {
             "type": "nationwide",
@@ -1135,6 +1150,7 @@ def test_match_program_eligible():
                 "categories": [
                     "technology"
                 ],
+
                 "programs": [
                     "information_technology",
                     "computer_science",
@@ -1152,41 +1168,84 @@ def test_match_program_eligible():
 
     assert result.program_id == 1
 
+    assert (
+        result.title
+        == "Test Technology Scholarship"
+    )
+
+    assert (
+        result.provider
+        == "Test Foundation"
+    )
+
+    assert (
+        result.category
+        == "scholarship"
+    )
+
+    assert (
+        result.status
+        == "open"
+    )
+
+    assert (
+        result.match_status
+        == ProgramMatchStatus.LIKELY_ELIGIBLE
+    )
+
     assert result.eligible is True
 
     assert result.score == 100
 
-    assert len(result.conflicts) == 0
+    assert len(
+        result.conflicts
+    ) == 0
 
-    assert len(result.uncertain) == 0
+    assert len(
+        result.uncertain
+    ) == 0
 
 
 def test_match_program_ineligible():
     """
-    User matches the program's relevance perfectly but fails
+    User matches program relevance perfectly but fails
     a mandatory income requirement.
 
-    This proves relevance score != eligibility.
+    This proves that relevance score and eligibility are
+    independent.
     """
 
     user = UserProfile(
         age=20,
         location="Manila",
+
         education_level="second_year_college",
+
         field_of_study="information_technology",
 
-        # Above program maximum.
         income=500000,
         income_period="annual",
         income_scope="family",
 
-        preferred_categories=["scholarship"],
-        interests=["technology"],
+        preferred_categories=[
+            "scholarship"
+        ],
+
+        interests=[
+            "technology"
+        ],
     )
 
     program = {
         "id": 2,
+
+        "title": "Income Limited Scholarship",
+
+        "provider": "Test Foundation",
+
         "category": "scholarship",
+
+        "status": "open",
 
         "coverage": {
             "type": "nationwide",
@@ -1219,6 +1278,7 @@ def test_match_program_ineligible():
                 "categories": [
                     "technology"
                 ],
+
                 "programs": [
                     "information_technology"
                 ],
@@ -1233,22 +1293,31 @@ def test_match_program_ineligible():
         program,
     )
 
+    assert (
+        result.match_status
+        == ProgramMatchStatus.LIKELY_INELIGIBLE
+    )
+
     assert result.eligible is False
 
-    # Relevance can still be perfect.
+    # Relevance can still be perfect even though the user
+    # fails a mandatory eligibility requirement.
     assert result.score == 100
 
-    assert len(result.conflicts) >= 1
+    assert len(
+        result.conflicts
+    ) >= 1
 
 
 def test_match_program_uncertain():
     """
-    Unknown additional requirements should prevent the engine
-    from claiming confirmed eligibility.
+    Unknown additional requirements should prevent the
+    engine from claiming confirmed eligibility.
     """
 
     user = UserProfile(
         age=20,
+
         preferred_categories=[
             "scholarship"
         ],
@@ -1257,7 +1326,13 @@ def test_match_program_uncertain():
     program = {
         "id": 3,
 
+        "title": "Scholarship With Extra Requirements",
+
+        "provider": "Test Foundation",
+
         "category": "scholarship",
+
+        "status": "open",
 
         "coverage": {
             "type": "nationwide",
@@ -1296,33 +1371,110 @@ def test_match_program_uncertain():
         program,
     )
 
+    assert (
+        result.match_status
+        == ProgramMatchStatus.NEEDS_VERIFICATION
+    )
+
     assert result.eligible is None
 
-    assert len(result.uncertain) >= 1
+    assert len(
+        result.uncertain
+    ) >= 1
 
 
-def test_non_student_program_does_not_require_education():
+def test_match_program_no_evaluable_requirements():
     """
-    Critical ParaSayoPH behavior:
+    Critical safety behavior.
 
-    A person who is not studying must not be rejected from a
-    program that has no education requirement.
+    If the database contains no actual eligibility
+    requirements, the matcher must NOT claim that the user
+    is confirmed eligible.
     """
 
     user = UserProfile(
-        age=68,
-        location="Manila",
-        education_level=None,
-        field_of_study=None,
         preferred_categories=[
-            "financial_assistance"
+            "scholarship"
         ],
     )
 
     program = {
         "id": 4,
 
+        "title": "Program With Missing Eligibility Data",
+
+        "provider": None,
+
+        "category": "scholarship",
+
+        "status": "open",
+
+        "coverage": {},
+
+        "eligibility": {
+            "age": {
+                "min": -1,
+                "max": -1,
+            },
+
+            "education": {},
+
+            "income": {
+                "min": -1,
+                "max": -1,
+            },
+
+            "residency": {
+                "locations": [],
+            },
+
+            "fields": {
+                "categories": [],
+                "programs": [],
+            },
+
+            "other_requirements": [],
+        },
+    }
+
+    result = match_program(
+        user,
+        program,
+    )
+
+    assert result.eligible is None
+
+
+def test_non_student_program_does_not_require_education():
+    """
+    A person who is not studying must not be rejected from a
+    program that has no education or course requirement.
+    """
+
+    user = UserProfile(
+        age=68,
+
+        location="Manila",
+
+        education_level=None,
+
+        field_of_study=None,
+
+        preferred_categories=[
+            "financial_assistance"
+        ],
+    )
+
+    program = {
+        "id": 5,
+
+        "title": "Senior Citizen Financial Assistance",
+
+        "provider": "Test Government Agency",
+
         "category": "financial_assistance",
+
+        "status": "open",
 
         "coverage": {
             "type": "nationwide",
@@ -1381,6 +1533,8 @@ def test_non_student_program_does_not_require_education():
         == MatchStatus.NOT_APPLICABLE
     )
 
+    # Age is an explicit requirement and the user satisfies
+    # it, so eligibility can safely be confirmed.
     assert result.eligible is True
 
     assert result.score == 100
@@ -1395,7 +1549,9 @@ def test_match_program_requires_program_id():
     user = UserProfile()
 
     program = {
+        "title": "Test Program",
         "category": "scholarship",
+        "status": "open",
         "eligibility": {},
     }
 
@@ -1408,6 +1564,31 @@ def test_match_program_requires_program_id():
         assert False, (
             "match_program() should reject a program "
             "without an integer ID."
+        )
+
+    except ValueError:
+        pass
+
+
+def test_match_program_requires_title():
+    user = UserProfile()
+
+    program = {
+        "id": 100,
+        "category": "scholarship",
+        "status": "open",
+        "eligibility": {},
+    }
+
+    try:
+        match_program(
+            user,
+            program,
+        )
+
+        assert False, (
+            "match_program() should reject a program "
+            "without a valid title."
         )
 
     except ValueError:

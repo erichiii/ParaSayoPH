@@ -17,6 +17,31 @@ class MatchStatus(str, Enum):
     NOT_APPLICABLE = "not_applicable"
 
 
+class ProgramMatchStatus(str, Enum):
+    """
+    Frontend-friendly overall matching status.
+
+    LIKELY_ELIGIBLE:
+        The matcher was able to evaluate at least one
+        eligibility requirement and found no unresolved
+        or conflicting eligibility requirements.
+
+    NEEDS_VERIFICATION:
+        No known eligibility conflict exists, but some
+        requirements could not be verified, or there was
+        not enough eligibility information to confirm the
+        user's eligibility.
+
+    LIKELY_INELIGIBLE:
+        At least one explicit eligibility requirement
+        conflicts with the user's profile.
+    """
+
+    LIKELY_ELIGIBLE = "likely_eligible"
+    NEEDS_VERIFICATION = "needs_verification"
+    LIKELY_INELIGIBLE = "likely_ineligible"
+
+
 class CriterionResult(BaseModel):
     """
     Result of evaluating one criterion.
@@ -88,19 +113,6 @@ class UserProfile(BaseModel):
     # ---------------------------------------------------------
     # Flexible program-specific attributes
     # ---------------------------------------------------------
-    #
-    # Examples:
-    #
-    # {
-    #     "senior_citizen": True,
-    #     "pwd": False,
-    #     "solo_parent": True,
-    #     "filipino_citizen": True,
-    #     "employment_status": "unemployed"
-    # }
-    #
-    # These can later be used by deterministic matchers for
-    # program-specific requirements.
 
     other_attributes: dict[str, Any] = Field(
         default_factory=dict
@@ -111,27 +123,45 @@ class ProgramMatchResult(BaseModel):
     """
     Final result of matching one user against one program.
 
-    eligible:
-        True:
-            No known mandatory eligibility criterion failed
-            and all applicable criteria could be evaluated.
+    `eligible` preserves the deterministic backend decision.
 
-        False:
-            At least one mandatory eligibility criterion
-            clearly failed.
+    `match_status` gives the frontend a clearer presentation
+    state.
 
-        None:
-            No known conflict exists, but at least one
-            mandatory requirement could not be verified.
+    Programs should remain discoverable even when
+    match_status is LIKELY_INELIGIBLE. The status is used
+    for ranking and explanation, not for hiding programs.
     """
 
+    # ---------------------------------------------------------
+    # Program information
+    # ---------------------------------------------------------
+
     program_id: int
+
+    title: str
+
+    provider: str | None = None
+
+    category: str
+
+    status: str
+
+    # ---------------------------------------------------------
+    # Matching result
+    # ---------------------------------------------------------
 
     score: int
 
     eligible: bool | None
 
+    match_status: ProgramMatchStatus
+
     criteria: list[CriterionResult]
+
+    # ---------------------------------------------------------
+    # Explainability
+    # ---------------------------------------------------------
 
     matches: list[str] = Field(
         default_factory=list

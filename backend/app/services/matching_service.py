@@ -6,9 +6,9 @@ from app.schemas.matching import (
     CriterionResult,
     MatchStatus,
     ProgramMatchResult,
+    ProgramMatchStatus,
     UserProfile,
 )
-
 
 # ============================================================
 # MATCHING CONFIGURATION
@@ -31,7 +31,7 @@ ELIGIBILITY_CRITERIA = {
 # Relevance criteria determine how closely the program matches
 # what the user is looking for.
 #
-# These do NOT determine eligibility.
+# These DO NOT determine eligibility.
 RELEVANCE_WEIGHTS = {
     "category": 70,
     "interest": 30,
@@ -82,7 +82,7 @@ def _criterion_max_points(
     criterion: str,
 ) -> int:
     """
-    Return scoring weight for a relevance criterion.
+    Return the scoring weight for a relevance criterion.
 
     Eligibility criteria intentionally receive zero points
     because eligibility and ranking are separate concepts.
@@ -457,7 +457,7 @@ def match_location(
                 )
 
     # ---------------------------------------------------------
-    # Nationwide
+    # Nationwide coverage
     # ---------------------------------------------------------
 
     if isinstance(coverage, dict):
@@ -570,10 +570,7 @@ def match_education(
     if eligibility is None:
         return _not_applicable(
             criterion,
-            (
-                "The program does not list an "
-                "education requirement."
-            ),
+            "The program does not list an education requirement.",
         )
 
     education = eligibility.get("education")
@@ -584,10 +581,7 @@ def match_education(
     ):
         return _not_applicable(
             criterion,
-            (
-                "The program does not list an "
-                "education requirement."
-            ),
+            "The program does not list an education requirement.",
         )
 
     levels = education.get("levels")
@@ -615,10 +609,7 @@ def match_education(
 
         return _not_applicable(
             criterion,
-            (
-                "The program does not list an "
-                "education requirement."
-            ),
+            "The program does not list an education requirement.",
         )
 
     if (
@@ -675,10 +666,7 @@ def match_education(
     if user_level in recognized_levels:
         return _match(
             criterion,
-            (
-                "Your education level is accepted "
-                "by the program."
-            ),
+            "Your education level is accepted by the program.",
         )
 
     if has_unrecognized_levels:
@@ -797,7 +785,7 @@ def match_income(
         )
 
     # ---------------------------------------------------------
-    # Period
+    # Income period
     # ---------------------------------------------------------
 
     normalized_program_period = None
@@ -850,7 +838,7 @@ def match_income(
         )
 
     # ---------------------------------------------------------
-    # Scope
+    # Income scope
     # ---------------------------------------------------------
 
     normalized_program_scope = None
@@ -905,7 +893,7 @@ def match_income(
         )
 
     # ---------------------------------------------------------
-    # Compare
+    # Compare income
     # ---------------------------------------------------------
 
     if valid_minimum and user.income < minimum:
@@ -932,7 +920,7 @@ def match_income(
             (
                 "Your income is within the program's "
                 f"eligible range of {minimum:,.0f} "
-                f"to {maximum:,.0f} per "
+                f"to {maximum:,.0f} "
                 f"{normalized_program_period}."
             ),
         )
@@ -942,7 +930,7 @@ def match_income(
             criterion,
             (
                 "Your income is within the program's "
-                f"maximum limit of {maximum:,.0f} per "
+                f"maximum limit of {maximum:,.0f} "
                 f"{normalized_program_period}."
             ),
         )
@@ -951,7 +939,7 @@ def match_income(
         criterion,
         (
             "Your income meets the program's minimum "
-            f"requirement of {minimum:,.0f} per "
+            f"requirement of {minimum:,.0f} "
             f"{normalized_program_period}."
         ),
     )
@@ -967,7 +955,8 @@ def match_field_of_study(
     program: dict[str, Any],
 ) -> CriterionResult:
     """
-    Compare user's course against structured eligible courses.
+    Compare the user's course against structured eligible
+    courses.
 
     Exact normalized program identifiers are used.
     """
@@ -1099,27 +1088,12 @@ def match_other_requirements(
     """
     Conservatively handle free-text eligibility requirements.
 
-    The scraper currently stores other_requirements as
-    arbitrary natural-language strings.
+    Arbitrary natural-language requirements are not guessed.
 
-    Examples include:
-    - citizenship
-    - GPA / grade requirements
-    - health requirements
-    - scholarship conflicts
-    - special group membership
-    - family relationships
-    - institution-specific requirements
-
-    These cannot yet be evaluated safely and deterministically.
-
-    Therefore:
+    For the MVP:
 
     - No requirements -> NOT_APPLICABLE
     - Requirements exist -> UNKNOWN
-
-    The matcher intentionally does NOT infer eligibility from
-    arbitrary natural language.
     """
 
     criterion = "other_requirements"
@@ -1270,11 +1244,8 @@ def match_interest(
 
     Interest is a relevance criterion only.
 
-    For the current MVP, program interest signals are derived
-    only from structured fields.categories.
-
-    We deliberately do not search description/raw_text using
-    fuzzy matching because that would weaken determinism.
+    For the MVP, program interest signals are derived from
+    structured fields.categories.
     """
 
     criterion = "interest"
@@ -1393,21 +1364,21 @@ def _determine_eligibility(
     """
     Determine final eligibility from mandatory criteria.
 
-    Policy:
-
     False:
-        At least one applicable eligibility criterion is
-        a definite NO_MATCH.
+        At least one explicit eligibility criterion
+        definitely failed.
 
     None:
-        No definite conflict exists, but at least one
-        applicable eligibility criterion is UNKNOWN.
+        - At least one eligibility criterion is UNKNOWN, or
+        - No actual eligibility requirements could be
+          evaluated.
 
     True:
-        Every applicable eligibility criterion is MATCH
-        or NOT_APPLICABLE.
+        At least one explicit eligibility requirement was
+        evaluated and every applicable requirement passed.
 
-    Category and interest are intentionally ignored here.
+    Relevance criteria such as category and interest do not
+    affect eligibility.
     """
 
     eligibility_results = [
@@ -1416,11 +1387,19 @@ def _determine_eligibility(
         if result.criterion in ELIGIBILITY_CRITERIA
     ]
 
+    # ---------------------------------------------------------
+    # Any known conflict means ineligible
+    # ---------------------------------------------------------
+
     if any(
         result.status == MatchStatus.NO_MATCH
         for result in eligibility_results
     ):
         return False
+
+    # ---------------------------------------------------------
+    # Any unresolved requirement prevents confirmed eligibility
+    # ---------------------------------------------------------
 
     if any(
         result.status == MatchStatus.UNKNOWN
@@ -1428,8 +1407,45 @@ def _determine_eligibility(
     ):
         return None
 
+    # ---------------------------------------------------------
+    # Determine whether anything was actually evaluated
+    # ---------------------------------------------------------
+
+    applicable_results = [
+        result
+        for result in eligibility_results
+        if result.status != MatchStatus.NOT_APPLICABLE
+    ]
+
+    # If every eligibility criterion was NOT_APPLICABLE,
+    # there is not enough evidence to claim that the user is
+    # confirmed eligible.
+    if not applicable_results:
+        return None
+
     return True
 
+def _determine_match_status(
+    eligible: bool | None,
+) -> ProgramMatchStatus:
+    """
+    Convert the internal eligibility decision into a
+    frontend-friendly presentation status.
+
+    The frontend should use this status to group and label
+    opportunities.
+
+    Programs are never removed solely because they are
+    LIKELY_INELIGIBLE.
+    """
+
+    if eligible is True:
+        return ProgramMatchStatus.LIKELY_ELIGIBLE
+
+    if eligible is False:
+        return ProgramMatchStatus.LIKELY_INELIGIBLE
+
+    return ProgramMatchStatus.NEEDS_VERIFICATION
 
 # ============================================================
 # RELEVANCE SCORE
@@ -1448,18 +1464,17 @@ def _calculate_relevance_score(
 
     NOT_APPLICABLE criteria are removed from the denominator.
 
-    This means a user who provides no interests can still
-    receive a 100 relevance score if the program perfectly
-    matches their requested category.
-
-    Eligibility does NOT contribute to this score.
+    Eligibility does not contribute to this score.
     """
 
     relevance_results = [
         result
         for result in criteria
-        if result.criterion in RELEVANCE_WEIGHTS
-        and result.status != MatchStatus.NOT_APPLICABLE
+        if (
+            result.criterion in RELEVANCE_WEIGHTS
+            and result.status
+            != MatchStatus.NOT_APPLICABLE
+        )
     ]
 
     available_points = sum(
@@ -1479,7 +1494,10 @@ def _calculate_relevance_score(
         (earned_points / available_points) * 100
     )
 
-    return max(0, min(100, score))
+    return max(
+        0,
+        min(100, score),
+    )
 
 
 # ============================================================
@@ -1489,18 +1507,18 @@ def _calculate_relevance_score(
 
 def _build_explanations(
     criteria: list[CriterionResult],
-) -> tuple[list[str], list[str], list[str]]:
+) -> tuple[
+    list[str],
+    list[str],
+    list[str],
+]:
     """
-    Convert criterion results into frontend-friendly
-    explanation groups.
+    Convert criterion results into frontend-friendly groups.
 
     MATCH          -> matches
     NO_MATCH       -> conflicts
     UNKNOWN        -> uncertain
     NOT_APPLICABLE -> omitted
-
-    NOT_APPLICABLE is intentionally excluded because it
-    normally adds noise rather than useful explanation.
     """
 
     matches: list[str] = []
@@ -1508,14 +1526,21 @@ def _build_explanations(
     uncertain: list[str] = []
 
     for result in criteria:
+
         if result.status == MatchStatus.MATCH:
-            matches.append(result.reason)
+            matches.append(
+                result.reason
+            )
 
         elif result.status == MatchStatus.NO_MATCH:
-            conflicts.append(result.reason)
+            conflicts.append(
+                result.reason
+            )
 
         elif result.status == MatchStatus.UNKNOWN:
-            uncertain.append(result.reason)
+            uncertain.append(
+                result.reason
+            )
 
     return (
         matches,
@@ -1537,41 +1562,23 @@ def match_program(
     Run the complete deterministic matching pipeline for one
     user and one program.
 
-    Pipeline:
+    Eligibility:
+        age
+        location
+        education
+        income
+        field of study
+        other requirements
 
-        user + program
-              |
-              v
-        eligibility checks
-              |
-              +-- age
-              +-- location
-              +-- education
-              +-- income
-              +-- field of study
-              +-- other requirements
-              |
-              v
-        eligible = True / False / None
-
-        relevance checks
-              |
-              +-- category
-              +-- interest
-              |
-              v
-        relevance score 0-100
-
-        all criterion results
-              |
-              v
-        matches / conflicts / uncertain
+    Relevance:
+        category
+        interest
 
     No AI or fuzzy inference is performed.
     """
 
     # ---------------------------------------------------------
-    # Program ID
+    # Validate program ID
     # ---------------------------------------------------------
 
     raw_program_id = program.get("id")
@@ -1585,33 +1592,105 @@ def match_program(
         )
 
     # ---------------------------------------------------------
-    # Run all deterministic criteria
+    # Validate frontend display information
+    # ---------------------------------------------------------
+
+    title = program.get("title")
+
+    if (
+        not isinstance(title, str)
+        or not title.strip()
+    ):
+        raise ValueError(
+            "Program must contain a valid title."
+        )
+
+    category = program.get("category")
+
+    if (
+        not isinstance(category, str)
+        or not category.strip()
+    ):
+        raise ValueError(
+            "Program must contain a valid category."
+        )
+
+    provider = program.get("provider")
+
+    if (
+        not isinstance(provider, str)
+        or not provider.strip()
+    ):
+        provider = None
+    else:
+        provider = provider.strip()
+
+    status = program.get("status")
+
+    if (
+        not isinstance(status, str)
+        or not status.strip()
+    ):
+        status = "unknown"
+    else:
+        status = status.strip()
+
+    # ---------------------------------------------------------
+    # Run deterministic criteria
     # ---------------------------------------------------------
 
     criteria = [
         # Eligibility
-        match_age(user, program),
-        match_location(user, program),
-        match_education(user, program),
-        match_income(user, program),
-        match_field_of_study(user, program),
-        match_other_requirements(user, program),
+        match_age(
+            user,
+            program,
+        ),
+        match_location(
+            user,
+            program,
+        ),
+        match_education(
+            user,
+            program,
+        ),
+        match_income(
+            user,
+            program,
+        ),
+        match_field_of_study(
+            user,
+            program,
+        ),
+        match_other_requirements(
+            user,
+            program,
+        ),
 
         # Relevance
-        match_category(user, program),
-        match_interest(user, program),
+        match_category(
+            user,
+            program,
+        ),
+        match_interest(
+            user,
+            program,
+        ),
     ]
 
     # ---------------------------------------------------------
-    # Eligibility
+    # Determine eligibility
     # ---------------------------------------------------------
 
     eligible = _determine_eligibility(
         criteria
     )
 
+    match_status = _determine_match_status(
+        eligible
+    )
+
     # ---------------------------------------------------------
-    # Relevance
+    # Calculate relevance
     # ---------------------------------------------------------
 
     score = _calculate_relevance_score(
@@ -1619,25 +1698,43 @@ def match_program(
     )
 
     # ---------------------------------------------------------
-    # Explainability
+    # Build explanations
     # ---------------------------------------------------------
 
     (
         matches,
         conflicts,
         uncertain,
-    ) = _build_explanations(criteria)
+    ) = _build_explanations(
+        criteria
+    )
 
     # ---------------------------------------------------------
-    # Final result
+    # Final response
     # ---------------------------------------------------------
 
     return ProgramMatchResult(
         program_id=raw_program_id,
+
+        title=title.strip(),
+
+        provider=provider,
+
+        category=category.strip(),
+
+        status=status,
+
         score=score,
+
         eligible=eligible,
+
+        match_status=match_status,
+
         criteria=criteria,
+
         matches=matches,
+
         conflicts=conflicts,
+
         uncertain=uncertain,
     )
