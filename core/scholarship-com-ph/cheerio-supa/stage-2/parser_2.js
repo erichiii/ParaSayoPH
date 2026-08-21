@@ -202,6 +202,7 @@ function cleanApplicationUrl(href, paramsToRemove) {
     }
 }
 
+const contentWrapperClass = rules?.dom_traversal?.content_wrapper || '.entry-content';
 const stepPattern = rules?.dom_traversal?.step_pattern || '^step\\s*\\d+';
 const residencyTriggers = rules?.extraction?.residency?.raw_triggers || 'resident|residency|residing|township|project';
 const incomeExclusions = rules?.extraction?.other_requirements?.income_exclusions || 'income|gross|₱|php|\\$';
@@ -256,7 +257,7 @@ function determineSection(text, triggers, stepPatternStr) {
     return null;
 }
 
-$('.entry-content').children().each((i, el) => {
+$(contentWrapperClass).children().each((i, el) => {
     const tag = el.tagName.toUpperCase();
     const text = $(el).text().trim();
 
@@ -368,7 +369,7 @@ $('.entry-content').children().each((i, el) => {
 if (currentStepHeader) processSteps.push(currentStepHeader);
 
 const verifiedTimestamp = new Date().toISOString();
-const fullBodyText = $('.entry-content').text() || pageText;
+const fullBodyText = $(contentWrapperClass).text() || pageText;
 
 let status = "unknown";
 const openStatusTriggers = rules?.status_evaluation?.open || ["applications ... are now open", "are now open", "accepting applications"];

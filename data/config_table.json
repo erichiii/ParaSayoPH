@@ -1,0 +1,91 @@
+{
+    "table": "scraper_configs",
+    "schema": "public",
+    "columns": [
+        {
+            "comment": null,
+            "data_type": "uuid",
+            "column_name": "id",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "gen_random_uuid()"
+        },
+        {
+            "comment": null,
+            "data_type": "text",
+            "column_name": "source_domain",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": null
+        },
+        {
+            "comment": null,
+            "data_type": "text",
+            "column_name": "version",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "'1.0.0'::text"
+        },
+        {
+            "comment": null,
+            "data_type": "boolean",
+            "column_name": "is_active",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": "true"
+        },
+        {
+            "comment": null,
+            "data_type": "jsonb",
+            "column_name": "rules",
+            "is_identity": false,
+            "is_nullable": false,
+            "identity_type": null,
+            "column_default": null
+        },
+        {
+            "comment": null,
+            "data_type": "timestamp with time zone",
+            "column_name": "created_at",
+            "is_identity": false,
+            "is_nullable": true,
+            "identity_type": null,
+            "column_default": "now()"
+        },
+        {
+            "comment": null,
+            "data_type": "timestamp with time zone",
+            "column_name": "updated_at",
+            "is_identity": false,
+            "is_nullable": true,
+            "identity_type": null,
+            "column_default": "now()"
+        }
+    ],
+    "comment": null,
+    "indexes": [
+        {
+            "is_unique": true,
+            "definition": "CREATE UNIQUE INDEX scraper_configs_pkey ON public.scraper_configs USING btree (id)",
+            "index_name": "scraper_configs_pkey",
+            "is_primary": true
+        },
+        {
+            "is_unique": false,
+            "definition": "CREATE INDEX idx_scraper_configs_domain ON public.scraper_configs USING btree (source_domain) WHERE (is_active = true)",
+            "index_name": "idx_scraper_configs_domain",
+            "is_primary": false
+        }
+    ],
+    "constraints": [
+        {
+            "definition": "PRIMARY KEY (id)",
+            "constraint_name": "scraper_configs_pkey",
+            "constraint_type": "PRIMARY KEY"
+        }
+    ]
+}
