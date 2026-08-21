@@ -34,9 +34,18 @@ if (!input.url) {
 navigate(input.url);
 const data = parse();
 
-if (data.next_page && currentPage < maxPages) {
-    console.log("Next page found:", data.next_page);
-    const nextPayload = buildPayload(data.next_page, currentDepth);
+let nextPageUrl = data.next_page;
+
+if (!nextPageUrl && parsedRules?.crawler_config?.pagination_template) {
+    if (data.next_depth_urls && data.next_depth_urls.length > 0) {
+        const nextPageNum = currentPage + 1;
+        nextPageUrl = parsedRules.crawler_config.pagination_template.replace('{page}', nextPageNum);
+    }
+}
+
+if (nextPageUrl && currentPage < maxPages) {
+    console.log("Next page queued:", nextPageUrl);
+    const nextPayload = buildPayload(nextPageUrl, currentDepth);
     nextPayload.current_page = currentPage + 1; 
     rerun_stage(nextPayload);
 }

@@ -203,6 +203,7 @@ function cleanApplicationUrl(href, paramsToRemove) {
 }
 
 const contentWrapperClass = rules?.dom_traversal?.content_wrapper || '.entry-content';
+
 const stepPattern = rules?.dom_traversal?.step_pattern || '^step\\s*\\d+';
 const residencyTriggers = rules?.extraction?.residency?.raw_triggers || 'resident|residency|residing|township|project';
 const incomeExclusions = rules?.extraction?.other_requirements?.income_exclusions || 'income|gross|₱|php|\\$';
@@ -412,10 +413,27 @@ for (const req of otherRequirements) {
 
 const finalFieldsRawText = fieldsRawTextParts.length > 0 ? [...new Set(fieldsRawTextParts)].join("\n\n") : "";
 
+function determineCategory(text, url, mappingRules) {
+    if (!mappingRules) return "scholarship";
+    
+    const targetString = ((url || "") + " " + (text || "")).toLowerCase();
+    
+    if (mappingRules.keywords) {
+        for (const [categoryName, keywords] of Object.entries(mappingRules.keywords)) {
+            if (keywords && keywords.length > 0 && keywords.some(kw => targetString.includes(kw.toLowerCase()))) {
+                return categoryName;
+            }
+        }
+    }
+    return mappingRules.default || "other";
+}
+
 const finalProgram = {
     title: cleanTitle(rawTitle, rules?.cleaning?.title) || "",
     provider: extractProvider(rawTitle, pageText, rules?.providers) || "",
-    category: "scholarship",
+    
+    category: determineCategory(fullBodyText, source_url, rules?.category_mapping), 
+    
     description: descriptionParts.join(" ") || "",
     coverage: extractCoverage(fullBodyText, coverageConfig),
     eligibility: {
