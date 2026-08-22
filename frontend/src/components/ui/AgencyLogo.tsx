@@ -6,6 +6,19 @@ type AgencyLogoProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
   src?: string | null
 }
 
+function AgencyFallbackIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="ps-agency-logo__fallback-icon"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path d="M4 21v-2h2V5h12v14h2v2H4Zm4-4h2v-2H8v2Zm0-4h2v-2H8v2Zm0-4h2V7H8v2Zm4 8h2v-2h-2v2Zm0-4h2v-2h-2v2Zm0-4h2V7h-2v2Z" />
+    </svg>
+  )
+}
+
 export function AgencyLogo({
   alt = '',
   className,
@@ -32,7 +45,7 @@ export function AgencyLogo({
           style={{ objectPosition }}
         />
       ) : (
-        <span aria-hidden="true">Agency</span>
+        <AgencyFallbackIcon />
       )}
     </div>
   )

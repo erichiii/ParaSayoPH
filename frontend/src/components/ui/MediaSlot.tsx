@@ -75,7 +75,9 @@ export function MediaSlot({
           style={{ objectPosition }}
         />
       ) : kind !== 'hero' ? (
-        <CategoryIcon category={category} />
+        <span aria-hidden="true" className="ps-media-slot__fallback-icon-circle">
+          <CategoryIcon category={category} />
+        </span>
       ) : null}
     </div>
   )
