@@ -420,10 +420,11 @@ for (const req of otherRequirements) {
 
 const finalFieldsRawText = fieldsRawTextParts.length > 0 ? [...new Set(fieldsRawTextParts)].join("\n\n") : "";
 
-function determineCategory(text, url, mappingRules) {
+function determineCategory(text, url, title, mappingRules) {
     if (!mappingRules) return "scholarship";
     
-    const targetString = ((url || "") + " " + (text || "")).toLowerCase();
+    const cleanUrl = (url || "").replace(/-/g, ' ');
+    const targetString = ((title || "") + " " + cleanUrl + " " + (text || "")).toLowerCase();
     
     if (mappingRules.keywords) {
         for (const [categoryName, keywords] of Object.entries(mappingRules.keywords)) {
@@ -440,7 +441,7 @@ const finalProgram = {
     
     provider: extractProvider(rawTitle, fullBodyText, rules?.providers) || "",
     
-    category: determineCategory(fullBodyText, source_url, rules?.category_mapping), 
+    category: determineCategory(fullBodyText, source_url, rawTitle, rules?.category_mapping), 
     
     description: descriptionParts.join(" ") || "",
     coverage: extractCoverage(fullBodyText, coverageConfig),
