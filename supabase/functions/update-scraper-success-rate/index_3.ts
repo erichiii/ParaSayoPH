@@ -48,19 +48,24 @@ serve(async (req) => {
 
       const bdLog = await bdResponse.json();
       
-      const inputs = bdLog.Inputs || 0;
-      const success = bdLog.Success || 0;
-      let successRate = null;
+      const success = bdLog.Success ?? bdLog.success ?? 0;
+      const fails = bdLog.Fails ?? bdLog.fails ?? bdLog.Errors ?? bdLog.errors ?? 0;
+      const jobStatus = String(bdLog.Status ?? bdLog.status ?? "").toLowerCase();
       
-      if (inputs > 0) {
-        successRate = Number(((success / inputs) * 100).toFixed(2));
+      let successRate = null;
+      const totalAttempts = success + fails;
+      
+      if (totalAttempts > 0) {
+        successRate = Number(((success / totalAttempts) * 100).toFixed(2));
+      } else if (jobStatus === "done" || jobStatus === "failed") {
+        successRate = 0;
       }
 
-      if (inputs > 0) {
+      if (["done", "failed", "canceled", "error"].includes(jobStatus)) {
          updates.push({
           id: run.id,
           success_rate: successRate,
-          status: "completed",
+          status: jobStatus === "done" ? "healthy" : "failed",
           completed_at: new Date().toISOString()
         });
       }
