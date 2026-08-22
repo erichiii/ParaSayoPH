@@ -1,23 +1,26 @@
 # Current Task
-FND-04 - Add application routes and a neutral shell
+### DES-02 - Implement design tokens and primitives
 
-Depends on: FND-03
-Task: Add route definitions and minimal placeholder page components only.
+**Depends on:** DES-01  
+**Task:** Build reusable visual primitives, not full pages.
 
-Required routes:
+**Expected components:**
 
-/
-/explore
-/matchmaker
-/results
-/programs/:id
+```text
+Button
+TextInput
+Select
+Chip
+RadioCard
+StatusBadge
+ProgramCard shell
+PageContainer
+InlineInfoCallout
+```
 
-Acceptance criteria:
+**Acceptance criteria:**
 
-- Every route renders without an error.
-
-- Unknown routes have a basic not-found state.
-
-- No page contains final visual design or real data integration yet.
-
-- Production build succeeds.
+- Components follow approved tokens.
+- Keyboard focus, disabled, selected, error, and loading states are visible where applicable.
+- Controls have labels and touch-safe sizing.
+- Components contain no program-specific business logic.

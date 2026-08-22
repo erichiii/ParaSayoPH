@@ -1,17 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  font-family: system-ui, sans-serif;
-  color: #111827;
-  background: #ffffff;
+  /* Color */
+  --color-brand-blue-700: #053476;
+  --color-brand-blue-600: #063982;
+  --color-brand-blue-500: #265595;
+  --color-brand-blue-300: #6a90ce;
+  --color-brand-red-500: #e33b3b;
+  --color-brand-yellow-500: #ffc735;
+  --color-ink-900: #152e50;
+  --color-ink-700: #2b476c;
+  --color-ink-500: #5f6f85;
+  --color-surface-canvas: #fcfbfa;
+  --color-surface-default: #ffffff;
+  --color-surface-warm: #fff8ed;
+  --color-surface-blue-soft: #eef4fc;
+  --color-border-subtle: #dbe1ea;
+  --color-border-strong: #b9c8de;
+  --color-success-bg: #e8f5e9;
+  --color-success-text: #267347;
+  --color-focus: #ffc735;
+
+  /* Typography */
+  --font-sans: "Poppins", "Segoe UI", Arial, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-size-caption: 0.75rem;
+  --font-size-small: 0.875rem;
+  --font-size-body: 1rem;
+  --font-size-h4: 1.125rem;
+  --font-size-h3: 1.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h1: 3.5rem;
+  --line-height-tight: 1.1;
+  --line-height-heading: 1.2;
+  --line-height-body: 1.6;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+  --space-9: 4rem;
+  --space-10: 5rem;
+  --space-11: 6rem;
+
+  /* Shape and elevation */
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+  --radius-section: 1rem;
+  --radius-pill: 999px;
+  --shadow-subtle: 0 2px 8px rgb(21 46 80 / 8%);
+  --shadow-card: 0 8px 24px rgb(5 52 118 / 12%);
+  --shadow-floating: 0 16px 40px rgb(5 52 118 / 16%);
+
+  /* Layout */
+  --content-max-width: 75rem;
+  --page-gutter-desktop: 2rem;
+  --page-gutter-mobile: 1rem;
+
+  font-family: var(--font-sans);
+  color: var(--color-ink-900);
+  background: var(--color-surface-canvas);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+  background: var(--color-surface-canvas);
+  color: var(--color-ink-700);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.ps-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ps-button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.ps-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.ps-button--primary {
+  background: var(--color-brand-blue-600);
+  color: var(--color-surface-default);
+}
+
+.ps-button--hero {
+  background: var(--color-brand-yellow-500);
+  color: var(--color-ink-900);
+}
+
+.ps-button--secondary {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-default);
+  color: var(--color-brand-blue-600);
+}
+
+.ps-card {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-default);
+  box-shadow: var(--shadow-card);
+}
+
+.ps-section-container {
+  width: min(100%, var(--content-max-width));
+  margin-inline: auto;
+  padding-inline: var(--page-gutter-desktop);
+}
+
+.ps-icon-circle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+}
+
+.ps-icon-circle--small {
+  width: 2rem;
+  height: 2rem;
+}
+
+.ps-icon-circle--medium {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.ps-icon-circle--large {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.ps-icon-circle--brand {
+  background: var(--color-brand-blue-700);
+  color: var(--color-surface-default);
+}
+
+.ps-icon-circle--soft {
+  background: var(--color-surface-blue-soft);
+  color: var(--color-brand-blue-600);
+}
+
+.ps-icon-circle--warm {
+  background: var(--color-surface-warm);
+  color: var(--color-brand-blue-700);
+}
+
+.ps-media-slot {
+  position: relative;
+  display: grid;
+  width: 100%;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-blue-soft);
+}
+
+.ps-media-slot--hero {
+  border-radius: 0;
+  background-color: var(--color-brand-blue-700);
+  background-image:
+    linear-gradient(30deg, rgb(255 255 255 / 5%) 12%, transparent 12.5%, transparent 87%, rgb(255 255 255 / 5%) 87.5%),
+    linear-gradient(150deg, rgb(255 255 255 / 5%) 12%, transparent 12.5%, transparent 87%, rgb(255 255 255 / 5%) 87.5%);
+  background-position: right center;
+  background-size: 3rem 3rem;
+}
+
+.ps-media-slot--fallback {
+  background: linear-gradient(135deg, var(--color-surface-blue-soft), var(--color-surface-warm));
+  color: var(--color-brand-blue-600);
+}
+
+.ps-media-slot__image,
+.ps-agency-logo__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ps-media-slot__fallback-icon {
+  width: 3rem;
+  height: 3rem;
+}
+
+.ps-agency-logo {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-default);
+}
+
+.ps-agency-logo__image {
+  object-fit: contain;
+}
+
+.ps-agency-logo--fallback {
+  background: var(--color-surface-blue-soft);
+  color: var(--color-ink-500);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+}
+
+@media (max-width: 47.999rem) {
+  .ps-section-container {
+    padding-inline: var(--page-gutter-mobile);
+  }
 }
