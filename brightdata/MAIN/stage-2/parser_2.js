@@ -37,10 +37,17 @@ function cleanTitle(text, rulesArray) {
 
 function extractProvider(title, text, providersMap) {
     if (!providersMap) return "";
-    const titleUpper = title.toUpperCase();
-    const textSnippet = text.substring(0, 1000).toUpperCase();
+    const titleUpper = (title || "").toUpperCase();
+    
     for (const [providerName, keywords] of Object.entries(providersMap)) {
-        if (keywords.some(kw => titleUpper.includes(kw.toUpperCase()) || textSnippet.includes(kw.toUpperCase()))) {
+        if (keywords.some(kw => titleUpper.includes(kw.toUpperCase()))) {
+            return providerName;
+        }
+    }
+    
+    const textSnippet = (text || "").substring(0, 1000).toUpperCase();
+    for (const [providerName, keywords] of Object.entries(providersMap)) {
+        if (keywords.some(kw => textSnippet.includes(kw.toUpperCase()))) {
             return providerName;
         }
     }
@@ -370,7 +377,7 @@ $(contentWrapperClass).children().each((i, el) => {
 if (currentStepHeader) processSteps.push(currentStepHeader);
 
 const verifiedTimestamp = new Date().toISOString();
-const fullBodyText = $(contentWrapperClass).text() || pageText;
+const fullBodyText = $(contentWrapperClass).text() || pageText; 
 
 let status = "unknown";
 const openStatusTriggers = rules?.status_evaluation?.open || ["applications ... are now open", "are now open", "accepting applications"];
@@ -430,7 +437,8 @@ function determineCategory(text, url, mappingRules) {
 
 const finalProgram = {
     title: cleanTitle(rawTitle, rules?.cleaning?.title) || "",
-    provider: extractProvider(rawTitle, pageText, rules?.providers) || "",
+    
+    provider: extractProvider(rawTitle, fullBodyText, rules?.providers) || "",
     
     category: determineCategory(fullBodyText, source_url, rules?.category_mapping), 
     
