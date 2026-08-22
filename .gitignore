@@ -1,6 +1,9 @@
+/mirror
 .env
 .venv/
 about/
 requirements.txt
 __pycache__/
 *.pyc
+supabase/
+node_modules/

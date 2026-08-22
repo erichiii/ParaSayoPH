@@ -1,44 +1,37 @@
 from __future__ import annotations
 
 from typing import Any
-from urllib.parse import urlparse
 
 from pydantic import ValidationError
 
 from app.database import supabase
-from app.schemas.program import ProgramData, VALID_STATUSES
+from app.schemas.program import ProgramData
 from app.services.normalization import normalize_program
 from app.services.duplicate_service import find_duplicate_program
-from app.services.metrics_service import calculate_scrape_run_metrics
+from app.services.field_validation import validate_program_fields
 
 
-TABLE_RAW = "raw_scraped_records"
+TABLE_STAGING = "staging_scraper"
 TABLE_PROGRAMS = "programs"
 
 
-def _is_valid_url(value: Any) -> bool:
-    """Check whether a value is a valid HTTP/HTTPS URL."""
-
-    if not isinstance(value, str):
-        return False
-
-    parsed = urlparse(value)
-
-    return (
-        parsed.scheme in {"http", "https"}
-        and bool(parsed.netloc)
-    )
-
-
 def _classify(
-    raw_data: dict[str, Any],
-) -> tuple[str, str | None, ProgramData | None]:
-    """Normalize, validate, and classify one raw scraped record."""
+    scraped_data: dict[str, Any],
+) -> tuple[
+    str,
+    str | None,
+    ProgramData | None,
+    list[dict[str, str]],
+]:
+    """
+    Normalize, structurally validate, and perform field-level
+    validation on one scraped program.
+    """
 
-    # Normalize scraper output before validation.
-    normalized_data = normalize_program(raw_data)
+    # Normalize scraper output before structural validation.
+    normalized_data = normalize_program(scraped_data)
 
-    # Structural validation.
+    # Structural validation using the canonical ProgramData schema.
     try:
         program = ProgramData.model_validate(normalized_data)
 
@@ -52,56 +45,134 @@ def _classify(
             "failed",
             f"Structural validation failed: {reasons}",
             None,
+            [],
         )
 
-    # Quality checks.
-    review_reasons: list[str] = []
+    # Deterministic field-level validation.
+    field_flags = validate_program_fields(program)
 
-    if not program.provider or not program.provider.strip():
-        review_reasons.append(
-            "provider is missing or blank"
+    # Only error-level flags block migration.
+    blocking_flags = [
+        flag
+        for flag in field_flags
+        if flag.get("severity") == "error"
+    ]
+
+    if blocking_flags:
+        reasons = "; ".join(
+            f"{flag['field']}: {flag['reason']}"
+            for flag in blocking_flags
         )
 
-    source_url = program.source.get("url")
-
-    if not source_url or not str(source_url).strip():
-        review_reasons.append(
-            "source.url is missing or blank"
-        )
-
-    elif not _is_valid_url(source_url):
-        review_reasons.append(
-            "source.url is not a valid HTTP/HTTPS URL"
-        )
-
-    if not program.description or not program.description.strip():
-        review_reasons.append(
-            "description is missing or blank"
-        )
-
-    if program.status not in VALID_STATUSES:
-        review_reasons.append(
-            f"status '{program.status}' is invalid"
-        )
-
-    if review_reasons:
         return (
             "needs_review",
-            "; ".join(review_reasons),
+            reasons,
             program,
+            field_flags,
         )
 
-    return "processed", None, program
+    # Warning-level flags are preserved but do not block migration.
+    return (
+        "processed",
+        None,
+        program,
+        field_flags,
+    )
 
 
-def process_pending_records() -> dict[str, int]:
-    """Process all raw records currently marked as pending."""
+def _build_scraped_data(
+    staging_record: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    Extract only canonical program fields from a staging row.
+
+    Staging metadata such as id, source_url, migration_status,
+    first_seen_at, and last_scraped_at is intentionally excluded.
+    """
+
+    return {
+        "title": staging_record.get("title"),
+        "provider": staging_record.get("provider"),
+        "category": staging_record.get("category"),
+        "description": staging_record.get("description"),
+        "coverage": staging_record.get("coverage"),
+        "eligibility": staging_record.get("eligibility"),
+        "benefits": staging_record.get("benefits"),
+        "requirements": staging_record.get("requirements"),
+        "application": staging_record.get("application"),
+        "source": staging_record.get("source"),
+        "status": staging_record.get("status"),
+    }
+
+
+def _update_staging_record(
+    staging_id: int,
+    *,
+    migration_status: str,
+    migration_error: str | None,
+    field_flags: list[dict[str, str]],
+) -> None:
+    """
+    Update the backend migration state of a staging record.
+    """
+
+    (
+        supabase
+        .table(TABLE_STAGING)
+        .update({
+            "migration_status": migration_status,
+            "migration_error": migration_error,
+            "field_flags": field_flags,
+        })
+        .eq("id", staging_id)
+        .execute()
+    )
+
+
+def _find_program_by_staging_id(
+    staging_id: int,
+) -> dict[str, Any] | None:
+    """
+    Find the canonical program previously created from
+    this exact staging scraper record.
+
+    If found, the current scrape represents an update to
+    that canonical program rather than a duplicate.
+    """
 
     response = (
         supabase
-        .table(TABLE_RAW)
+        .table(TABLE_PROGRAMS)
         .select("*")
-        .eq("processing_status", "pending")
+        .eq("staging_record_id", staging_id)
+        .limit(1)
+        .execute()
+    )
+
+    if response.data:
+        return response.data[0]
+
+    return None
+
+
+def process_pending_records() -> dict[str, int]:
+    """
+    Process every staging scraper record currently marked
+    as pending.
+
+    Possible outcomes:
+    - inserted
+    - updated
+    - duplicate
+    - needs_review
+    - failed
+    """
+
+    response = (
+        supabase
+        .table(TABLE_STAGING)
+        .select("*")
+        .eq("migration_status", "pending")
         .execute()
     )
 
@@ -109,125 +180,147 @@ def process_pending_records() -> dict[str, int]:
 
     counts = {
         "records_checked": len(pending_records),
-        "processed": 0,
+        "inserted": 0,
+        "updated": 0,
         "duplicates": 0,
         "needs_review": 0,
         "failed": 0,
     }
 
-    # Track which scrape runs are affected by this processing batch.
-    scrape_run_ids: set[int] = set()
+    for staging_record in pending_records:
+        staging_id = staging_record["id"]
 
-    for raw_record in pending_records:
-        raw_id = raw_record["id"]
-        raw_data = raw_record.get("raw_data")
+        # ---------------------------------------------------------
+        # 1. Build canonical program input
+        # ---------------------------------------------------------
 
-        # Remember which scrape run this record belongs to.
-        scrape_run_id = raw_record.get("scrape_run_id")
+        scraped_data = _build_scraped_data(staging_record)
 
-        if scrape_run_id is not None:
-            scrape_run_ids.add(scrape_run_id)
+        (
+            classification,
+            error_detail,
+            program,
+            field_flags,
+        ) = _classify(scraped_data)
 
-        # Protect against malformed/non-object raw_data.
-        if not isinstance(raw_data, dict):
-            (
-                supabase
-                .table(TABLE_RAW)
-                .update({
-                    "processing_status": "failed",
-                    "processing_error": (
-                        "Structural validation failed: "
-                        "raw_data must be a JSON object"
-                    ),
-                })
-                .eq("id", raw_id)
-                .execute()
-            )
+        # ---------------------------------------------------------
+        # 2. Structural validation failed
+        # ---------------------------------------------------------
 
-            counts["failed"] += 1
-            continue
-
-        classification, error_detail, program = _classify(raw_data)
-
-        # Structurally invalid.
         if classification == "failed":
-            (
-                supabase
-                .table(TABLE_RAW)
-                .update({
-                    "processing_status": "failed",
-                    "processing_error": error_detail,
-                })
-                .eq("id", raw_id)
-                .execute()
+            _update_staging_record(
+                staging_id,
+                migration_status="failed",
+                migration_error=error_detail,
+                field_flags=field_flags,
             )
 
             counts["failed"] += 1
             continue
 
-        # Valid structure but suspicious/incomplete.
+        # ---------------------------------------------------------
+        # 3. Blocking field-level validation problems
+        # ---------------------------------------------------------
+
         if classification == "needs_review":
-            (
-                supabase
-                .table(TABLE_RAW)
-                .update({
-                    "processing_status": "needs_review",
-                    "processing_error": error_detail,
-                })
-                .eq("id", raw_id)
-                .execute()
+            _update_staging_record(
+                staging_id,
+                migration_status="needs_review",
+                migration_error=error_detail,
+                field_flags=field_flags,
             )
 
             counts["needs_review"] += 1
             continue
 
-        # This should always exist for a processed record.
+        # Defensive check.
         if program is None:
-            (
-                supabase
-                .table(TABLE_RAW)
-                .update({
-                    "processing_status": "failed",
-                    "processing_error": (
-                        "Internal processing error: "
-                        "validated program is missing"
-                    ),
-                })
-                .eq("id", raw_id)
-                .execute()
+            _update_staging_record(
+                staging_id,
+                migration_status="failed",
+                migration_error=(
+                    "Internal processing error: "
+                    "validated program is missing"
+                ),
+                field_flags=field_flags,
             )
 
             counts["failed"] += 1
             continue
 
-        # Check for an existing canonical program.
         program_data = program.model_dump()
+
+        # ---------------------------------------------------------
+        # 4. Check whether THIS staging record was migrated before
+        # ---------------------------------------------------------
+
+        existing_program = _find_program_by_staging_id(staging_id)
+
+        if existing_program:
+            # This is not a duplicate.
+            # Bright Data re-scraped a program that we previously
+            # migrated, so update the existing canonical row.
+            try:
+                (
+                    supabase
+                    .table(TABLE_PROGRAMS)
+                    .update(program_data)
+                    .eq("id", existing_program["id"])
+                    .execute()
+                )
+
+            except Exception as exc:
+                _update_staging_record(
+                    staging_id,
+                    migration_status="failed",
+                    migration_error=(
+                        f"Program update failed: "
+                        f"{type(exc).__name__}"
+                    ),
+                    field_flags=field_flags,
+                )
+
+                counts["failed"] += 1
+                continue
+
+            _update_staging_record(
+                staging_id,
+                migration_status="migrated",
+                migration_error=None,
+                field_flags=field_flags,
+            )
+
+            counts["updated"] += 1
+            continue
+
+        # ---------------------------------------------------------
+        # 5. Check for a true duplicate
+        # ---------------------------------------------------------
 
         duplicate = find_duplicate_program(program_data)
 
         if duplicate:
-            (
-                supabase
-                .table(TABLE_RAW)
-                .update({
-                    "processing_status": "duplicate",
-                    "processing_error": (
-                        f"Duplicate of program {duplicate['id']}"
-                    ),
-                    "duplicate_of_program_id": duplicate["id"],
-                })
-                .eq("id", raw_id)
-                .execute()
+            _update_staging_record(
+                staging_id,
+                migration_status="duplicate",
+                migration_error=(
+                    f"Duplicate of program {duplicate['id']}"
+                ),
+                field_flags=field_flags,
             )
 
             counts["duplicates"] += 1
             continue
 
-        # Build the clean programs row from validated Pydantic data.
-        program_row = program.model_dump()
-        program_row["raw_record_id"] = raw_id
+        # ---------------------------------------------------------
+        # 6. New program: insert into canonical programs table
+        # ---------------------------------------------------------
 
-        # Insert the new canonical program.
+        program_row = program.model_dump()
+
+        # Preserve traceability back to staging_scraper.
+        program_row["staging_record_id"] = staging_id
+
         try:
             (
                 supabase
@@ -237,40 +330,30 @@ def process_pending_records() -> dict[str, int]:
             )
 
         except Exception as exc:
-            # Database insertion failed, so do not mark as processed.
-            (
-                supabase
-                .table(TABLE_RAW)
-                .update({
-                    "processing_status": "failed",
-                    "processing_error": (
-                        f"Program insert failed: {type(exc).__name__}"
-                    ),
-                })
-                .eq("id", raw_id)
-                .execute()
+            _update_staging_record(
+                staging_id,
+                migration_status="failed",
+                migration_error=(
+                    f"Program insert failed: "
+                    f"{type(exc).__name__}"
+                ),
+                field_flags=field_flags,
             )
 
             counts["failed"] += 1
             continue
 
-        # Only mark processed after successful program insertion.
-        (
-            supabase
-            .table(TABLE_RAW)
-            .update({
-                "processing_status": "processed",
-                "processing_error": None,
-            })
-            .eq("id", raw_id)
-            .execute()
+        # ---------------------------------------------------------
+        # 7. Migration completed successfully
+        # ---------------------------------------------------------
+
+        _update_staging_record(
+            staging_id,
+            migration_status="migrated",
+            migration_error=None,
+            field_flags=field_flags,
         )
 
-        counts["processed"] += 1
-
-    # All pending records have now been classified.
-    # Recalculate metrics for every affected scrape run.
-    for scrape_run_id in scrape_run_ids:
-        calculate_scrape_run_metrics(scrape_run_id)
+        counts["inserted"] += 1
 
     return counts
