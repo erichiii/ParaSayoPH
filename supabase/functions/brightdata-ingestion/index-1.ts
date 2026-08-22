@@ -13,6 +13,14 @@ serve(async (req) => {
        );
     }
 
+    const runMetrics: Record<string, number> = {};
+    for (const item of dataArray) {
+      if (item.input && item.input._run_id) {
+        const rId = String(item.input._run_id);
+        runMetrics[rId] = (runMetrics[rId] || 0) + 1;
+      }
+    }
+
     const cleanData = dataArray.map((item) => {
       if (item.input) delete item.input;
       if (item.source && item.source.url) item.source_url = item.source.url;
@@ -28,6 +36,17 @@ serve(async (req) => {
     });
 
     if (error) throw error;
+
+    for (const [runId, count] of Object.entries(runMetrics)) {
+      const { error: healthError } = await supabase.rpc("increment_health_metrics", {
+        p_run_id: parseInt(runId, 10),
+        p_extracted: count
+      });
+      
+      if (healthError) {
+        console.error(`Health metric update failed for run ${runId}:`, healthError.message);
+      }
+    }
 
     return new Response(
       JSON.stringify({ message: "Successfully ingested data via RPC." }),

@@ -37,15 +37,37 @@ serve(async (req) => {
        );
     }
 
+    const runsToInsert = configs.map(config => ({
+      source: config.source_domain,
+      mode: mode,
+      status: 'running'
+    }));
+
+    const { data: insertedRuns, error: insertError } = await supabase
+      .from("scraper_health_runs")
+      .insert(runsToInsert)
+      .select("id, source");
+
+    if (insertError) {
+      console.error("Health run insert warning:", insertError.message);
+    }
+
     const payloads = configs.map((config) => {
       const startUrl = config.rules?.crawler_config?.start_url || `https://${config.source_domain}/`;
       
-      return {
+      const payload: any = {
         url: startUrl,
         depth: 1,
         max_pages: maxPages,
         rules: JSON.stringify(config.rules)
       };
+
+      if (insertedRuns) {
+        const run = insertedRuns.find(r => r.source === config.source_domain);
+        if (run) payload._run_id = run.id;
+      }
+
+      return payload;
     });
 
     const triggerUrl = `https://api.brightdata.com/dca/trigger?collector=${collectorId}&queue_next=1&override_incompatible_schema=1`;
@@ -63,6 +85,17 @@ serve(async (req) => {
 
     if (!response.ok) {
        throw new Error(`Bright Data API Error: ${JSON.stringify(bdData)}`);
+    }
+
+    if (insertedRuns && insertedRuns.length > 0 && bdData && bdData.collection_id) {
+      const { error: updateError } = await supabase
+        .from("scraper_health_runs")
+        .update({ brightdata_snapshot_id: bdData.collection_id })
+        .in("id", insertedRuns.map(r => r.id));
+        
+      if (updateError) {
+        console.error("Failed to update snapshot ID:", updateError.message);
+      }
     }
 
     return new Response(JSON.stringify({
