@@ -7,7 +7,14 @@ try {
     console.warn("Parser warning: input.rules is not a valid JSON string. Falling back to defaults.");
 }
 
-const rawTitle = input.title || $('h1.entry-title, h1.post-title, h1').first().text().trim();
+let rawTitle = input.title;
+if (!rawTitle) {
+    rawTitle = $('h1.entry-title').first().text().trim() || 
+               $('h1.post-title').first().text().trim() || 
+               $('article h1').first().text().trim() || 
+               $('h1').first().text().trim();
+}
+
 const pageText = $('body').text();
 const pageTextLower = pageText.toLowerCase();
 
@@ -45,7 +52,7 @@ function extractProvider(title, text, providersMap) {
         }
     }
     
-    const textSnippet = (text || "").substring(0, 1000).toUpperCase();
+    const textSnippet = (text || "").substring(0, 3000).toUpperCase();
     for (const [providerName, keywords] of Object.entries(providersMap)) {
         if (keywords.some(kw => textSnippet.includes(kw.toUpperCase()))) {
             return providerName;
@@ -438,11 +445,8 @@ function determineCategory(text, url, title, mappingRules) {
 
 const finalProgram = {
     title: cleanTitle(rawTitle, rules?.cleaning?.title) || "",
-    
     provider: extractProvider(rawTitle, fullBodyText, rules?.providers) || "",
-    
     category: determineCategory(fullBodyText, source_url, rawTitle, rules?.category_mapping), 
-    
     description: descriptionParts.join(" ") || "",
     coverage: extractCoverage(fullBodyText, coverageConfig),
     eligibility: {
