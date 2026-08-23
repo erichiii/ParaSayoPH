@@ -1,11 +1,13 @@
 const source_url = input.url;
 
-let rules = {};
+let rawParsed = {};
 try {
-    rules = typeof input.rules === 'string' ? JSON.parse(input.rules) : (input.rules || {});
+    rawParsed = typeof input.rules === 'string' ? JSON.parse(input.rules) : (input.rules || {});
 } catch (e) {
-    console.warn("Parser warning: input.rules is not a valid JSON string. Falling back to defaults.");
+    console.warn("Parser warning: input.rules is not a valid JSON string.");
 }
+
+const rules = rawParsed.rules ? rawParsed.rules : rawParsed;
 
 let rawTitle = input.title;
 if (!rawTitle) {
@@ -42,7 +44,7 @@ function cleanTitle(text, rulesArray) {
     return cleaned.replace(/\s+/g, ' ').trim();
 }
 
-function extractProvider(title, text, providersMap) {
+function extractProvider(title, bodyText, fullPageText, providersMap) {
     if (!providersMap) return "";
     const titleUpper = (title || "").toUpperCase();
     
@@ -51,13 +53,21 @@ function extractProvider(title, text, providersMap) {
             return providerName;
         }
     }
-    
-    const textSnippet = (text || "").substring(0, 3000).toUpperCase();
+
+    const bodySnippet = (bodyText || "").toUpperCase();
     for (const [providerName, keywords] of Object.entries(providersMap)) {
-        if (keywords.some(kw => textSnippet.includes(kw.toUpperCase()))) {
+        if (keywords.some(kw => bodySnippet.includes(kw.toUpperCase()))) {
             return providerName;
         }
     }
+
+    const pageSnippet = (fullPageText || "").toUpperCase();
+    for (const [providerName, keywords] of Object.entries(providersMap)) {
+        if (keywords.some(kw => pageSnippet.includes(kw.toUpperCase()))) {
+            return providerName;
+        }
+    }
+    
     return "";
 }
 
@@ -445,7 +455,7 @@ function determineCategory(text, url, title, mappingRules) {
 
 const finalProgram = {
     title: cleanTitle(rawTitle, rules?.cleaning?.title) || "",
-    provider: extractProvider(rawTitle, fullBodyText, rules?.providers) || "",
+    provider: extractProvider(rawTitle, fullBodyText, pageText, rules?.providers) || "",
     category: determineCategory(fullBodyText, source_url, rawTitle, rules?.category_mapping), 
     description: descriptionParts.join(" ") || "",
     coverage: extractCoverage(fullBodyText, coverageConfig),
