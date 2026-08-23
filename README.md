@@ -3,6 +3,7 @@
 <div align="center">
   <img src="docs/front_page.png" alt="ParaSayo PH Front Page" width="100%">
 </div>
+<br>
 
 ParaSa’yoPH is a self-healing discovery platform that gathers fragmented information about scholarships, government assistance, free training, and other public opportunities across the Philippines. It transforms scattered online postings into structured, validated, and searchable data, then matches users with programs based on their needs, location, education, employment status, and eligibility.
 
