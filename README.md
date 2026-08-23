@@ -35,7 +35,7 @@ ParaSayo PH uses a modular two-stage ETL pipeline powered entirely by custom Bri
     To avoid bloating the IDE with hard-coded conditional logic and extensive dictionaries, regex patterns and agency rulesets are stored externally in a Supabase PostgreSQL database. Bright Data's Dynamic Input Payloads inject these rulesets (*see rulesets for sources **[here](https://github.com/erichiii/ParaSayoPH/tree/7710397ccb466b248dbb77d7334240838ff60038/data/ruleset)***) into the scraper at runtime.
 
 
-The scraper's execution environment applies the injected logic to map messy raw data directly into the unified JSON schema (capturing titles, providers, deadlines, and eligibility criteria). **Scraper Studio's self-healing** feature allows for quick and automated adaptation to layout shifts or DOM changes to keep the data pipeline uninterrupted. ***[Click here to see a Sample Output.](placeholder)***
+The scraper's execution environment applies the injected logic to map messy raw data directly into the unified JSON schema (capturing titles, providers, deadlines, and eligibility criteria). **Scraper Studio's self-healing** feature allows for quick and automated adaptation to layout shifts or DOM changes to keep the data pipeline uninterrupted. ***[Click here to see a Sample Output.](https://github.com/erichiii/ParaSayoPH/blob/ca248ee21d4197320103521862b7359f6a5ca626/data/common/output_snippet.json)***
 
 
 <div align="center">
