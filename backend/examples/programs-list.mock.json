@@ -1,0 +1,53 @@
+[
+  {
+    "id": "17",
+    "title": "Example Training Program",
+    "provider": null,
+    "category": "training",
+    "description": null,
+    "coverage": {
+      "type": "nationwide",
+      "locations": []
+    },
+    "eligibility": {
+      "age": {
+        "min": null,
+        "max": null,
+        "raw_text": null
+      },
+      "education": {
+        "levels": [],
+        "raw_text": null
+      },
+      "employment": {
+        "statuses": [],
+        "raw_text": null
+      },
+      "income": {
+        "min": null,
+        "max": null,
+        "period": null,
+        "scope": null,
+        "raw_text": null
+      },
+      "residency": {
+        "locations": [],
+        "raw_text": null
+      },
+      "other_requirements": []
+    },
+    "benefits": [],
+    "requirements": [],
+    "application": {
+      "start_date": null,
+      "deadline": null,
+      "process": null,
+      "url": null
+    },
+    "source": {
+      "url": "https://example.gov.ph/programs/example-training",
+      "last_verified_at": "2026-08-23T10:30:00+00:00"
+    },
+    "status": "unknown"
+  }
+]

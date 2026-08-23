@@ -236,7 +236,7 @@ The report documents a FastAPI backend using Pydantic for structural validation,
 |---|---|---|
 |**GET /programs**|Public browse/search/filter list of canonical programs.|Paginate; allow only controlled filters/sorts; default to non-closed according to product policy.|
 |**GET /programs/{id}**|Public program detail.|Return canonical detail, provenance metadata safe for users, and official application/source links.|
-|**POST /api/matches**|Compute ranked, explainable matches from a transient profile payload.|Validate profile IDs server-side; avoid storing profile data by default.|
+|**POST /api/match**|Compute qualitative, explainable matches from a transient profile payload.|Validate approved profile IDs server-side; omit known conflicts and do not store profile data.|
 |**GET /api/scrape-runs/{id}/metrics**|Technical/demo source-health data.|Protect or separate from public product surfaces if operational detail is sensitive.|
 |**GET /health**|Service health probe.|Must not disclose dependency secrets or stack traces.|
 
@@ -326,7 +326,7 @@ The report documents a FastAPI backend using Pydantic for structural validation,
 |**Source scheduling**|Per-request scrape runs are documented; periodic scanning is suggested.|Cadence, orchestration, retry budget, and source ownership.|
 |**Semantic validation**|Structural + quality checks are implemented; deep cross-field consistency is future work.|Rules and confidence thresholds for detecting text/structured-data contradiction.|
 |**Ranking**|Explainable qualitative matching is required.|Weights, exclusion handling, tie-breaking, and calibration/review process.|
-|**Public API shape**|GET /programs and core pipeline endpoints are documented; /api/matches is proposed.|Versioning, pagination, filtering, cache behavior, and auth exposure.|
+|**Public API shape**|GET /programs and `POST /api/match` are approved public MVP routes.|Versioning, pagination, filtering, cache behavior, and auth exposure.|
 |**Manual review**|needs_review preserves data for later action.|Review queue owner, tooling, SLAs, and publish/remediation audit trail.|
 |**Data retention**|Raw evidence is required for provenance.|Retention period, archival, deletion, and privacy policy for source/profile data.|
 

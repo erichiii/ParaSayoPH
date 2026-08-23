@@ -121,6 +121,8 @@ export function ExplorePage() {
   const routeCategory = getCategoryFromRouteState(location.state)
   const [programs, setPrograms] = useState<Program[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [requestVersion, setRequestVersion] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | 'all'>(routeCategory ?? 'all')
   const [selectedStatus, setSelectedStatus] = useState<ProgramStatus | 'all'>('all')
@@ -128,16 +130,28 @@ export function ExplorePage() {
 
   useEffect(() => {
     let isCurrent = true
-    void getPrograms().then((data) => {
-      if (isCurrent) {
-        setPrograms(data)
-        setIsLoading(false)
-      }
-    })
+
+    void getPrograms()
+      .then((data) => {
+        if (isCurrent) {
+          setPrograms(data)
+        }
+      })
+      .catch(() => {
+        if (isCurrent) {
+          setPrograms([])
+          setLoadError('We could not load opportunities right now. Please try again.')
+        }
+      })
+      .finally(() => {
+        if (isCurrent) {
+          setIsLoading(false)
+        }
+      })
     return () => {
       isCurrent = false
     }
-  }, [])
+  }, [requestVersion])
 
   // Filter programs based on query, category, and status
   const filteredPrograms = useMemo(() => {
@@ -332,6 +346,8 @@ export function ExplorePage() {
               <p className="ps-explore-results-count">
                 {isLoading
                   ? 'Loading opportunities...'
+                  : loadError
+                    ? 'Unable to load opportunities'
                   : totalItems > 0
                     ? `Showing ${startCount}–${endCount} of ${totalItems} opportunities`
                     : 'Showing 0 opportunities'}
@@ -416,7 +432,26 @@ export function ExplorePage() {
           ) : null}
 
           {/* Empty State */}
-          {!isLoading && filteredPrograms.length === 0 ? (
+          {!isLoading && loadError ? (
+            <div className="ps-explore-empty-state" role="alert">
+              <IconCircle size="large" tone="warm">
+                <svg aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ width: '1.75rem', height: '1.75rem' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M5.1 19h13.8c1.5 0 2.4-1.6 1.7-2.9L13.7 4.3c-.7-1.3-2.7-1.3-3.4 0L3.4 16.1C2.7 17.4 3.6 19 5.1 19Z" />
+                </svg>
+              </IconCircle>
+              <h3>Unable to load programs</h3>
+              <p>{loadError}</p>
+              <button className="ps-button ps-button--primary" onClick={() => {
+                setIsLoading(true)
+                setLoadError(null)
+                setRequestVersion((version) => version + 1)
+              }} type="button">
+                Try again
+              </button>
+            </div>
+          ) : null}
+
+          {!isLoading && !loadError && filteredPrograms.length === 0 ? (
             <div className="ps-explore-empty-state">
               <IconCircle size="large" tone="warm">
                 <svg aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ width: '1.75rem', height: '1.75rem' }}>

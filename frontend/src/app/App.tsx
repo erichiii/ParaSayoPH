@@ -7,7 +7,6 @@ import { PlaceholderPage } from '../pages/PlaceholderPage'
 import { ProgramCardPreviewPage } from '../pages/ProgramCardPreviewPage'
 import { ProgramDetailPage } from '../pages/ProgramDetailPage'
 import { ResultsPage } from '../pages/ResultsPage'
-import { ResultsPreviewPage } from '../pages/ResultsPreviewPage'
 
 function PrimaryLayout() {
   return (
@@ -28,12 +27,7 @@ export function App() {
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/programs/:id" element={<ProgramDetailPage />} />
       </Route>
-      {import.meta.env.DEV ? (
-        <>
-          <Route path="/_preview/program-cards" element={<ProgramCardPreviewPage />} />
-          <Route path="/_preview/results" element={<ResultsPreviewPage />} />
-        </>
-      ) : null}
+      {import.meta.env.DEV ? <Route path="/_preview/program-cards" element={<ProgramCardPreviewPage />} /> : null}
       <Route path="*" element={<PlaceholderPage title="Page not found" />} />
     </Routes>
   )

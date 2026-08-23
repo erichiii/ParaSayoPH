@@ -1,30 +1,34 @@
+import type { EducationLevelId, EmploymentStatusId, RegionId } from '../domain/profile'
 import type { ProgramCategory, ProgramStatus } from '../domain/program'
 
-// TODO: Replace or map these UI-only fixtures when Backend supplies the authoritative taxonomy response.
-// These values are not production backend IDs.
 export const matchRegions = [
-  { value: 'NCR', label: 'National Capital Region (NCR)' },
-  { value: 'CAR', label: 'Cordillera Administrative Region (CAR)' },
-  { value: 'Region III', label: 'Region III – Central Luzon' },
-  { value: 'Region IV-A', label: 'Region IV-A – CALABARZON' },
-  { value: 'Region VII', label: 'Region VII – Central Visayas' },
-  { value: 'Region XI', label: 'Region XI – Davao Region' },
-  { value: 'BARMM', label: 'Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)' },
-] as const
+  { value: 'ncr', label: 'National Capital Region' },
+  { value: 'car', label: 'Cordillera Administrative Region' },
+  { value: 'region_3', label: 'Central Luzon' },
+  { value: 'region_4a', label: 'CALABARZON' },
+  { value: 'region_4b', label: 'MIMAROPA' },
+  { value: 'region_6', label: 'Western Visayas' },
+  { value: 'region_7', label: 'Central Visayas' },
+  { value: 'region_10', label: 'Northern Mindanao' },
+  { value: 'region_11', label: 'Davao Region' },
+  { value: 'region_12', label: 'SOCCSKSARGEN' },
+  { value: 'barmm', label: 'Bangsamoro Autonomous Region in Muslim Mindanao' },
+] as const satisfies readonly { value: RegionId; label: string }[]
 
 export const matchEmploymentStatuses = [
   { value: 'student', label: 'Student', description: 'Currently studying' },
   { value: 'employed', label: 'Working', description: 'Currently employed' },
   { value: 'job_seeker', label: 'Looking for work', description: 'Actively seeking opportunities' },
   { value: 'other', label: 'Other', description: 'Something else' },
-] as const
+] as const satisfies readonly { value: EmploymentStatusId; label: string; description: string }[]
 
 export const matchEducationLevels = [
-  { value: 'high_school', label: 'High school' },
-  { value: 'senior_high_school', label: 'Senior high school' },
-  { value: 'college', label: 'College' },
-  { value: 'graduate_or_higher', label: 'Graduate / higher' },
-] as const
+  { value: 'incoming_first_year_college', label: 'Incoming first-year college' },
+  { value: 'second_year_college', label: 'Second-year college' },
+  { value: 'third_year_college', label: 'Third-year college' },
+  { value: 'fourth_year_college', label: 'Fourth-year college' },
+  { value: 'tvet', label: 'Technical-vocational education' },
+] as const satisfies readonly { value: EducationLevelId; label: string }[]
 
 export const matchCategoryChoices = [
   'scholarship',

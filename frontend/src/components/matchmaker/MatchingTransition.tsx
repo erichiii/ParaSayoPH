@@ -2,15 +2,25 @@ import type { CSSProperties } from 'react'
 import { Button } from '../ui/Button'
 
 type MatchingTransitionProps = {
-  isFailure?: boolean
+  failureKind?: 'network' | 'validation'
   onRetry?: () => void
 }
-export function MatchingTransition({ isFailure = false, onRetry }: MatchingTransitionProps) {
-  if (isFailure) {
+export function MatchingTransition({ failureKind, onRetry }: MatchingTransitionProps) {
+  if (failureKind === 'validation') {
+    return (
+      <section className="ps-matching-transition ps-matching-transition--failure" role="alert">
+        <h1>Some answers need updating.</h1>
+        <p>Edit your answers, then try finding opportunities again.</p>
+        {onRetry ? <Button onClick={onRetry}>Edit answers</Button> : null}
+      </section>
+    )
+  }
+
+  if (failureKind === 'network') {
     return (
       <section className="ps-matching-transition ps-matching-transition--failure" role="status">
         <h1>We couldn&apos;t find your matches right now.</h1>
-        <p>Your answers are kept for this session.</p>
+        <p>Please try again. Your answers are still available while you stay on this page.</p>
         {onRetry ? <Button onClick={onRetry}>Try again</Button> : null}
       </section>
     )

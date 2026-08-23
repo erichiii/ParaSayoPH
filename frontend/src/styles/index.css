@@ -2133,6 +2133,7 @@ textarea {
   }
 
   .ps-explore-hero {
+    overflow: hidden;
     padding-block: var(--space-6) 3.5rem;
   }
 
@@ -2171,6 +2172,11 @@ textarea {
 
   .ps-explore-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ps-explore-pagination__controls {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .ps-explore-source-callout {

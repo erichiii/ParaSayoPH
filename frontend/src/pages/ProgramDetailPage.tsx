@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Link, useLocation, useParams } from 'react-router'
-import { getProgramById } from '../api/programs'
+import { ProgramNotFoundError, getProgramById } from '../api/programs'
 import { ProgramStatusBadge } from '../components/programs/ProgramStatusBadge'
 import { AgencyLogo } from '../components/ui/AgencyLogo'
 import { Card } from '../components/ui/Card'
@@ -10,6 +10,7 @@ import { SectionContainer } from '../components/ui/SectionContainer'
 import { brandAssets } from '../data/brandAssets'
 import { programCategoryLabels } from '../data/taxonomies'
 import type { Program } from '../domain/program'
+import type { MatchProfile } from '../domain/profile'
 
 type DetailSectionKind = 'application' | 'benefits' | 'coverage' | 'description' | 'requirements'
 
@@ -24,6 +25,7 @@ type BrandAssetStyles = CSSProperties & Record<`--${string}`, string>
 type ProgramEntryState = {
   from: 'results' | 'explore'
   returnTo: '/results' | '/explore'
+  lastMatchedProfile?: MatchProfile
 }
 
 const coverageLabels = {
@@ -119,31 +121,70 @@ function isResultsEntry(state: unknown): state is ProgramEntryState {
   }
 
   const entry = state as Partial<ProgramEntryState>
-  return entry.from === 'results' && entry.returnTo === '/results'
+  return entry.from === 'results' && entry.returnTo === '/results' && Boolean(entry.lastMatchedProfile)
 }
 
 export function ProgramDetailPage() {
-  const location = useLocation()
   const { id } = useParams()
+  return <ProgramDetailContent key={id} id={id ?? ''} />
+}
+
+function ProgramDetailContent({ id }: { id: string }) {
+  const location = useLocation()
   const [program, setProgram] = useState<Program | null | undefined>(undefined)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [requestVersion, setRequestVersion] = useState(0)
   const enteredFromResults = isResultsEntry(location.state)
   const returnTo = enteredFromResults ? '/results' : '/explore'
+  const returnState = enteredFromResults ? { lastMatchedProfile: (location.state as ProgramEntryState).lastMatchedProfile } : undefined
   const returnLabel = enteredFromResults ? 'Back to your matches' : 'Back to explore'
   const breadcrumbLabel = enteredFromResults ? 'Your matches' : 'Explore opportunities'
 
   useEffect(() => {
     let isCurrent = true
 
-    void getProgramById(id ?? '').then((result) => {
-      if (isCurrent) {
-        setProgram(result)
-      }
-    })
+    void getProgramById(id)
+      .then((result) => {
+        if (isCurrent) {
+          setProgram(result)
+        }
+      })
+      .catch((error: unknown) => {
+        if (!isCurrent) {
+          return
+        }
+        if (error instanceof ProgramNotFoundError) {
+          setProgram(null)
+          return
+        }
+        setLoadError('We could not load this program right now. Please try again.')
+      })
 
     return () => {
       isCurrent = false
     }
-  }, [id])
+  }, [id, requestVersion])
+
+  if (loadError) {
+    return (
+      <main className="ps-detail-page">
+        <SectionContainer className="ps-detail-state" role="alert">
+          <h1>Unable to load program</h1>
+          <p>{loadError}</p>
+          <button className="ps-button ps-button--primary" onClick={() => {
+            setProgram(undefined)
+            setLoadError(null)
+            setRequestVersion((version) => version + 1)
+          }} type="button">
+            Try again
+          </button>
+          <Link className="ps-detail-back-link" state={returnState} to={returnTo}>
+            ← {returnLabel}
+          </Link>
+        </SectionContainer>
+      </main>
+    )
+  }
 
   if (program === undefined) {
     return (
@@ -160,8 +201,8 @@ export function ProgramDetailPage() {
       <main className="ps-detail-page">
         <SectionContainer className="ps-detail-state">
           <h1>Program not found</h1>
-          <p>The requested local program fixture is unavailable.</p>
-          <Link className="ps-detail-back-link" to={returnTo}>
+          <p>The requested program is unavailable.</p>
+          <Link className="ps-detail-back-link" state={returnState} to={returnTo}>
             ← {returnLabel}
           </Link>
         </SectionContainer>
@@ -203,9 +244,9 @@ export function ProgramDetailPage() {
       <section className="ps-detail-summary-band">
         <SectionContainer>
           <nav aria-label="Breadcrumb" className="ps-detail-breadcrumb">
-            <Link to="/">Home</Link><span aria-hidden="true">›</span><Link to={returnTo}>{breadcrumbLabel}</Link><span aria-hidden="true">›</span><span>Program details</span>
+            <Link to="/">Home</Link><span aria-hidden="true">›</span><Link state={returnState} to={returnTo}>{breadcrumbLabel}</Link><span aria-hidden="true">›</span><span>Program details</span>
           </nav>
-          <Link className="ps-detail-back-link ps-detail-back-link--band" to={returnTo}>
+          <Link className="ps-detail-back-link ps-detail-back-link--band" state={returnState} to={returnTo}>
             ← {returnLabel}
           </Link>
           <Card className="ps-detail-summary-card">

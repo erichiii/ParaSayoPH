@@ -129,8 +129,8 @@ These are intentionally open. Agents must not invent answers.
 
 | Item | Required owner/input before integration |
 |---|---|
-| Exact public API routes and wrappers | Backend owner supplies current API documentation or response samples. |
-| Region, employment, and education taxonomy IDs | Backend owner supplies controlled taxonomy values. |
+| Match API route and wrapper | Approved: `POST /api/match` with a direct `MatchProfile` body and `{ results }` response. |
+| Region, employment, and education taxonomy IDs | Approved in `BACKEND_CONTRACT.md`; frontend must replace provisional fixtures before live Matchmaker integration. |
 | Program list/detail/match examples | Backend owner supplies one real public response for each. |
 | Final colors, spacing, radii, shadows, and responsive measurements | Project owner supplies approved design screens/tokens. |
 | Official-source authority/action metadata | Backend owner adds/validates it before the frontend claims an action is official. |

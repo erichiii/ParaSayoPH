@@ -110,38 +110,71 @@ The public API may provide a smaller summary form for program cards, but it must
 | empty eligibility arrays | Treat as no structured evidence, not proof that no requirement exists. |
 | `raw_text` / `other_requirements` | Render selectively on the detail page; never turn it into a match guarantee. |
 
-## 6. Matching baseline
+## 6. Matching contract (MCH-00 / MCH-00B approved)
 
 The frontend collects the documented profile concepts:
 
 ```ts
 type MatchProfile = {
-  location: string | null;
+  location: RegionId | null;
   age: number | null;
-  employment_status: string | null;
-  education_level: string | null;
-  categories_needed: ProgramCategory[];
+  employment_status: EmploymentStatusId | null;
+  education_level: EducationLevelId | null;
+  categories_needed: MatchableProgramCategory[];
 };
 ```
 
-The exact controlled values for region, employment status, and education level remain backend-owned. Until the backend provides its final taxonomy/fixture, the frontend keeps these values behind mock data and must not hard-code arbitrary production IDs.
+`POST /api/match` accepts this direct body and returns `{ "results": MatchResult[] }`. It stores no profile data. Unknown fields, invalid IDs, negative/non-integer ages, duplicate categories, and `other` in `categories_needed` return `422`.
+
+Controlled values:
+
+```text
+RegionId: ncr, car, region_3, region_4a, region_4b, region_6, region_7, region_10, region_11, region_12, barmm
+EmploymentStatusId: student, employed, job_seeker, other
+EducationLevelId: incoming_first_year_college, second_year_college, third_year_college, fourth_year_college, tvet
+```
+
+`MatchResult` contains a public `Program`, `match_state`, and factual reason objects `{ code, label }`. The only states are `likely_eligible` and `uncertain`; known explicit conflicts are omitted. Public results never expose scores, points, ranks, profile data, raw rows, or operational fields.
+
+The approved reason-code vocabulary is:
+
+```text
+category_selected
+age_within_range
+coverage_location_match
+nationwide_coverage
+residency_location_match
+employment_status_match
+education_level_match
+age_not_submitted
+location_not_submitted
+employment_not_submitted
+education_not_submitted
+age_criteria_unavailable
+location_criteria_unavailable
+employment_criteria_unavailable
+education_criteria_unavailable
+eligibility_details_unavailable
+```
+
+Each code has one fixed user-facing label in the backend matcher; the API emits no other reason codes.
 
 Matching is qualitative. The UI may show:
 
 - `likely_eligible` — known structured evidence aligns;
 - `uncertain` — relevant information is missing or ambiguous; and
-- actual reasons such as category, location, age, education, or employment alignment.
+- approved factual reason codes for category, location, age, education, and employment evidence.
 
 The MVP must not display an unsupported numerical percentage score. A known conflict may be omitted from personalized results or handled by backend policy; missing data is never a known conflict.
 
 ## 7. Public API integration boundary
 
-The precise live route names and response wrappers are not frozen in this document. Before real frontend integration, Backend provides all of the following:
+Before real frontend integration, Backend provides all of the following:
 
 1. One real public program-list response.
 2. One real public program-detail response.
 3. One real match request and response, including a partial/skipped profile.
-4. The accepted taxonomy values for regions, employment statuses, and education levels.
+4. One real `POST /api/match` response using the approved controlled IDs, including a partial/skipped profile.
 5. The public base URL and documented development CORS origin.
 
 Until then, frontend work uses fixtures conforming to Section 4 and puts all data access behind one API adapter. No page component should call `fetch` directly.

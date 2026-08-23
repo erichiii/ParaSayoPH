@@ -10,8 +10,7 @@ import {
   matchRegions,
   programCategoryLabels,
 } from '../data/taxonomies'
-import type { MatchProfile } from '../domain/profile'
-import type { ProgramCategory } from '../domain/program'
+import type { MatchProfile, MatchableProgramCategory, RegionId } from '../domain/profile'
 
 type MatchmakerStage = 'introduction' | 1 | 2 | 3 | 'review'
 type MatchmakerBrandStyles = CSSProperties & Record<`--${string}`, string>
@@ -165,7 +164,7 @@ export function MatchmakerPage() {
     setStage('review')
   }
 
-  const toggleCategory = (category: ProgramCategory) => {
+  const toggleCategory = (category: MatchableProgramCategory) => {
     setProfile((current) => ({
       ...current,
       categories_needed: current.categories_needed.includes(category)
@@ -195,7 +194,7 @@ export function MatchmakerPage() {
             className="ps-matchmaker-select"
             id="matchmaker-region"
             onChange={(event) => {
-              setProfileValue('location', event.target.value || null)
+              setProfileValue('location', event.target.value ? event.target.value as RegionId : null)
               setStepGuidance(null)
             }}
             value={profile.location ?? ''}
