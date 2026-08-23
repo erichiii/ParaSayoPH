@@ -1,0 +1,62 @@
+{
+  "title": "string",
+  "provider": "string | null",
+  "category": "string",
+
+  "description": "string | null",
+
+  "coverage": {
+    "type": "nationwide | regional | provincial | city | municipal | district | unknown",
+    "locations": []
+  },
+
+  "eligibility": {
+    "age": {
+      "min": null,
+      "max": null,
+      "raw_text": null
+    },
+
+    "education": {
+      "levels": [],
+      "raw_text": null
+    },
+
+    "employment": {
+      "statuses": [],
+      "raw_text": null
+    },
+
+    "income": {
+      "min": null,
+      "max": null,
+      "period": null,
+      "scope": null,
+      "raw_text": null
+    },
+
+    "residency": {
+      "locations": [],
+      "raw_text": null
+    },
+
+    "other_requirements": []
+  },
+
+  "benefits": [],
+  "requirements": [],
+
+  "application": {
+    "start_date": null,
+    "deadline": null,
+    "process": null,
+    "url": null
+  },
+
+  "source": {
+    "url": "string",
+    "last_verified_at": "ISO-8601 datetime"
+  },
+
+  "status": "open | ongoing | upcoming | closed | unknown"
+}
