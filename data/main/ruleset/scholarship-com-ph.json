@@ -44,7 +44,9 @@
             "Griffith University": [
                 "GRIFFITH UNIVERSITY",
                 "GRIFFITH COLLEGE",
-                "GELI"
+                "GELI",
+                "JOHN WILLETT INTERNATIONAL SCHOLARSHIP",
+                "ROTARY CLUB OF SOUTHPORT CYRIL RICHARDE AM INTERNATIONAL SCHOLARSHIP"
             ],
             "SM Foundation, Inc.": [
                 "SM FOUNDATION"
@@ -61,7 +63,10 @@
                 "FULBRIGHT PHILIPPINES",
                 "PHILIPPINE-AMERICAN EDUCATIONAL FOUNDATION",
                 "PAEF",
-                "FULBRIGHT"
+                "FULBRIGHT",
+                "FULLBRIGHT",
+                "UGRAD",
+                "HUBERT H. HUMPHREY FELLOWSHIP PROGRAM"
             ],
             "Ayala Foundation, Inc.": [
                 "AYALA FOUNDATION"
@@ -80,7 +85,8 @@
                 "VIVANT STEM"
             ],
             "Chulalongkorn University": [
-                "CHULALONGKORN UNIVERSITY"
+                "CHULALONGKORN UNIVERSITY",
+                "CHULALONGKORN ASEAN AND NON-ASEAN SCHOLARSHIP"
             ],
             "Davao City Water District": [
                 "DAVAO CITY WATER DISTRICT",
@@ -140,7 +146,9 @@
             "Commission on Higher Education": [
                 "CHED",
                 "COMMISSION ON HIGHER EDUCATION",
-                "UNIFAST"
+                "UNIFAST",
+                "BPMSP",
+                "BAGONG PILIPINAS MERIT SCHOLARSHIP PROGRAM"
             ],
             "Security Bank Foundation, Inc.": [
                 "SECURITY BANK FOUNDATION",
@@ -206,6 +214,29 @@
             "Philippine Army Finance Center Producers Integrated Cooperative": [
                 "PAFCPIC",
                 "PHILIPPINE ARMY FINANCE CENTER"
+            ],
+            "PHINMA": [
+                "PHINMA"
+            ],
+            "Tzu Chi Foundation": [
+                "TZU CHI FOUNDATION"
+            ],
+            "Charity First Foundation": [
+                "CHARITY FIRST FOUNDATION"
+            ],
+            "Maybank Foundation": [
+                "MAYBANK",
+                "ASEAN-MAYBANK"
+            ],
+            "Manaaki New Zealand": [
+                "MANAAKI NEW ZEALAND"
+            ],
+            "University of Melbourne": [
+                "UNIVERSITY OF MELBOURNE",
+                "MELBOURNE UNIVERSITY"
+            ],
+            "Ajinomoto Foundation": [
+                "AJINOMOTO FOUNDATION"
             ]
         },
         "blacklists": {

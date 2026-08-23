@@ -933,6 +933,75 @@
     ],
     "Alyansa Tigil Mina": [
       "ALYANSA TIGIL MINA"
+    ],
+    "Overseas Workers Welfare Administration": [
+      "OVERSEAS WORKERS WELFARE ADMINISTRATION",
+      "OWWA"
+    ],
+    "Commission on Higher Education": [
+      "COMMISSION ON HIGHER EDUCATION",
+      "CHED"
+    ],
+    "Land Bank of the Philippines": [
+      "LAND BANK OF THE PHILIPPINES",
+      "LANDBANK",
+      "LAND BANK"
+    ],
+    "Office of the Vice President": [
+      "OFFICE OF THE VICE PRESIDENT",
+      "OVP"
+    ],
+    "Department of Foreign Affairs": [
+      "DEPARTMENT OF FOREIGN AFFAIRS",
+      "DFA"
+    ],
+    "Department of Science and Technology": [
+      "DEPARTMENT OF SCIENCE AND TECHNOLOGY",
+      "DOST"
+    ],
+    "Department of Human Settlements and Urban Development": [
+      "DEPARTMENT OF HUMAN SETTLEMENTS AND URBAN DEVELOPMENT",
+      "DHSUD"
+    ],
+    "National Reintegration Center for OFWs": [
+      "NATIONAL REINTEGRATION CENTER FOR OFWS",
+      "NRCO"
+    ],
+    "Office of the Social Welfare Attaché": [
+      "OFFICE OF THE SOCIAL WELFARE ATTACHÉ",
+      "OSWA"
+    ],
+    "Commission on Indigenous Peoples": [
+      "COMMISSION ON INDIGENOUS PEOPLES",
+      "NCIP"
+    ],
+    "Department of Environment and Natural Resources": [
+      "DEPARTMENT OF ENVIRONMENT AND NATURAL RESOURCES",
+      "DENR"
+    ],
+    "Department of Energy": [
+      "DEPARTMENT OF ENERGY",
+      "DOE"
+    ],
+    "Department of Finance": [
+      "DEPARTMENT OF FINANCE",
+      "DOF"
+    ],
+    "Commission on Human Rights": [
+      "COMMISSION ON HUMAN RIGHTS",
+      "CHR"
+    ],
+    "Food and Drug Administration": [
+      "FOOD AND DRUG ADMINISTRATION",
+      "FDA"
+    ],
+    "Maritime Industry Authority": [
+      "MARITIME INDUSTRY AUTHORITY",
+      "MARINA"
+    ],
+    "Metropolitan Manila Development Authority": [
+      "METROPOLITAN MANILA DEVELOPMENT AUTHORITY",
+      "MMDA"
     ]
   },
   "blacklists": {
@@ -2530,7 +2599,15 @@
         "barista training",
         "trabaho para sa bayan act",
         "tpb act",
-        "tpb plan"
+        "tpb plan",
+        "neap inset",
+        "brave ako training program",
+        "financial literacy seminars",
+        "asean digital literacy",
+        "comprehensive rapid literacy assessment",
+        "crla",
+        "youth development worker training",
+        "short-term training ofws dependents"
       ],
       "scholarship": [
         "tuition",
@@ -2601,7 +2678,16 @@
         "pagcor scholarship",
         "pvao scholarship",
         "pcafpd scholarship",
-        "national university scholarships"
+        "national university scholarships",
+        "bagong pilipinas merit scholarship program",
+        "metrobank access scholarship",
+        "bpi foundation pagpupugay scholarship",
+        "ofw dependent scholarship program",
+        "project ease",
+        "odsp",
+        "sesp",
+        "ched smart scholarship grant",
+        "unified financial assistance system for tertiary education act"
       ],
       "ofw_assistance": [
         "ofw",
@@ -2651,7 +2737,22 @@
         "dmw 10-point agenda",
         "pre-employment orientation seminar",
         "peos",
-        "direct-hire processing service"
+        "direct-hire processing service",
+        "ofw e-card",
+        "ofw assistance information system",
+        "oasis",
+        "office of the social welfare attaché",
+        "oswa",
+        "owwa mobile application",
+        "owwa rebate program",
+        "migrant workers offices",
+        "mwo abroad",
+        "national reintegration center for ofws",
+        "nrco",
+        "ofw records",
+        "uwian na mobile app",
+        "tabang ofw program",
+        "medlop"
       ],
       "burial_assistance": [
         "burial",
@@ -2662,7 +2763,12 @@
         "coffin",
         "memorial",
         "funeral assistance",
-        "burial assistance"
+        "burial assistance",
+        "death and burial benefits program",
+        "death claim",
+        "survivors benefit",
+        "death claim without beneficiary",
+        "sss death claim"
       ],
       "crisis_assistance": [
         "crisis",
@@ -2705,7 +2811,17 @@
         "ayuda para sa kapos ang kita program",
         "recovery and reintegration program for trafficked persons",
         "rrptp",
-        "jail decongestion program"
+        "jail decongestion program",
+        "aksyon fund",
+        "distressed ofws",
+        "welfare assistance program",
+        "psychosocial counseling for distressed ofws",
+        "legal assistance programs",
+        "social welfare assistance",
+        "request relief augmentation",
+        "crisis help rules",
+        "aics assistance to individuals in crisis situations",
+        "welfare assistance program wap"
       ],
       "medical_assistance": [
         "medical",
@@ -2760,7 +2876,15 @@
         "charity assistance department",
         "cad",
         "institutional partnership program",
-        "pcso ipp"
+        "pcso ipp",
+        "maifipp",
+        "medical assistance for indigent and financially incapacitated patients program",
+        "medplus",
+        "anti-hospital deposit law",
+        "medical assistance ovp",
+        "senate public assistance office",
+        "spao",
+        "maipp"
       ],
       "disaster_assistance": [
         "disaster",
@@ -2791,7 +2915,14 @@
         "the big one earthquake",
         "west valley fault",
         "charitimba packs",
-        "evacuation kits"
+        "evacuation kits",
+        "emergency shelter assistance program",
+        "family access card in emergencies and disasters",
+        "faced",
+        "drmb",
+        "disaster response management bureau",
+        "ndrrmc",
+        "calamity loan assistance program"
       ],
       "financial_assistance": [
         "cash",
@@ -2848,7 +2979,26 @@
         "performance-based bonus",
         "pbb",
         "loan takeout",
-        "ltv ratio adjustment"
+        "ltv ratio adjustment",
+        "uplift cash aid",
+        "financial relief",
+        "rice farmers financial assistance",
+        "rffa",
+        "unemployment financial assistance program",
+        "financial assistance for solo parents",
+        "educational cash assistance",
+        "targeted cash transfer",
+        "unconditional cash transfer",
+        "cash-for-work program",
+        "uplift assistance program",
+        "financial relief assistance program",
+        "salary increase schedule",
+        "targeted cash transfer program",
+        "unconditional cash transfer program",
+        "sss pension loan program",
+        "social pension for senior citizens",
+        "pag-ibig multi-purpose loan",
+        "frap"
       ],
       "transportation_assistance": [
         "transportation",
@@ -2873,7 +3023,13 @@
         "patient transport vehicle",
         "ptv donation",
         "car loan",
-        "auto loan"
+        "auto loan",
+        "ofw travel pass",
+        "medical transport vehicle",
+        "ofw pass",
+        "one repatriation command center",
+        "orcc",
+        "repatriation assistance programs"
       ],
       "others": [
         "register anywhere program",
@@ -2993,7 +3149,15 @@
         "tourism infrastructure and enterprise zone authority",
         "tieza",
         "tourism enterprise zones",
-        "tez"
+        "tez",
+        "solo parents welfare act",
+        "certified list of overseas voters",
+        "clov",
+        "state of imminent disaster declaration",
+        "etravel philippines",
+        "philippine travel tax",
+        "social welfare and development indicator",
+        "swdi"
       ]
     }
   },
