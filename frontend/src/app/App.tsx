@@ -1,6 +1,7 @@
 import { Outlet, Route, Routes } from 'react-router'
 import { SiteFooter } from '../components/ui/SiteFooter'
 import { ExplorePage } from '../pages/ExplorePage'
+import { LandingPage } from '../pages/LandingPage'
 import { MatchmakerPage } from '../pages/MatchmakerPage'
 import { PlaceholderPage } from '../pages/PlaceholderPage'
 import { ProgramCardPreviewPage } from '../pages/ProgramCardPreviewPage'
@@ -21,7 +22,7 @@ export function App() {
   return (
     <Routes>
       <Route element={<PrimaryLayout />}>
-        <Route path="/" element={<PlaceholderPage title="Home" />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/matchmaker" element={<MatchmakerPage />} />
         <Route path="/results" element={<ResultsPage />} />

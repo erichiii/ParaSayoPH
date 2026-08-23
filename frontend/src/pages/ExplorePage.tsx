@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { getPrograms } from '../api/programs'
 import { AgencyLogo } from '../components/ui/AgencyLogo'
 import { Card } from '../components/ui/Card'
@@ -60,6 +60,17 @@ const filterCategories: { category: ProgramCategory; icon: string; label: string
   },
 ]
 
+function getCategoryFromRouteState(state: unknown): ProgramCategory | null {
+  if (!state || typeof state !== 'object') {
+    return null
+  }
+
+  const category = (state as { category?: unknown }).category
+  return typeof category === 'string' && category !== 'other' && category in programCategoryLabels
+    ? category as ProgramCategory
+    : null
+}
+
 const coverageLabels = {
   nationwide: 'Nationwide',
   regional: 'Regional',
@@ -106,10 +117,12 @@ function getDeadlineDisplay(deadline: string | null, status: ProgramStatus) {
 }
 
 export function ExplorePage() {
+  const location = useLocation()
+  const routeCategory = getCategoryFromRouteState(location.state)
   const [programs, setPrograms] = useState<Program[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | 'all'>('all')
+  const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | 'all'>(routeCategory ?? 'all')
   const [selectedStatus, setSelectedStatus] = useState<ProgramStatus | 'all'>('all')
   const [currentPage, setCurrentPage] = useState(1)
 
