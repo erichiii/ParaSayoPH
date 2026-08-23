@@ -14,6 +14,12 @@ python -m pip install -r requirements.txt
 
 Create a local `backend/.env` using `.env.example` as the variable-name template. Obtain the values through the team's approved secret-sharing process; do not commit the file.
 
+Required deployment variables (no values committed):
+
+- `SUPABASE_URL` — Supabase project URL
+- `SUPABASE_KEY` — Supabase service/anon key (keep secret)
+- `CORS_ORIGINS` — comma-separated explicit origins allowed to call the API (e.g., `http://localhost:5173,https://your-appwrite-site.appwrite.network`). Defaults to `http://localhost:5173,http://127.0.0.1:5173` for local development when unset. Do not use `*`.
+
 Start the API:
 
 ```powershell

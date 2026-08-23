@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,19 +10,24 @@ from app.routes.metrics import router as metrics_router
 from app.routes.matching import router as matching_router
 
 
+def _get_cors_origins() -> list[str]:
+    raw = os.getenv("CORS_ORIGINS", "")
+    if not raw.strip():
+        return ["http://localhost:5173", "http://127.0.0.1:5173"]
+    origins = [origin.strip().rstrip("/") for origin in raw.split(",") if origin.strip()]
+    origins = [origin for origin in origins if origin != "*"]
+    return origins if origins else ["http://localhost:5173", "http://127.0.0.1:5173"]
+
+
 app = FastAPI(
     title="ParaSayoPH API",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://your-project-id.appwrite.network",
-    ],
+    allow_origins=_get_cors_origins(),
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
