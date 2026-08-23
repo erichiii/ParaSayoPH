@@ -1,12 +1,6 @@
-import { getPrograms } from './programs'
+import { localMatchResults } from '../data/mockMatches'
 import type { MatchProfile, MatchResult } from './types'
 
 export async function getMatches(_profile: MatchProfile): Promise<MatchResult[]> {
-  const programs = await getPrograms()
-
-  return programs.map((program) => ({
-    program,
-    state: 'uncertain',
-    reasons: [],
-  }))
+  return localMatchResults.map((result) => ({ ...result, reasons: [...result.reasons] }))
 }

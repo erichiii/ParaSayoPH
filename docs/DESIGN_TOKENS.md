@@ -1,6 +1,6 @@
 # ParaSa'yo Design Tokens & Final Design Inputs
 
-**Status:** Locked for the landing-page visual system; pending owner-approved references for Matchmaker, Results, Program Detail, and mobile screen layouts.  
+**Status:** Locked for the landing-page visual system and Program Detail desktop/mobile; pending owner-approved references for Matchmaker, Results, and remaining mobile screen layouts.  
 **Decision date:** 2026-08-22  
 **Authority:** Project owner
 
@@ -12,16 +12,29 @@
 | Landing — mobile | Pending owner reference | Use the locked responsive rules in section 7 as a layout baseline, but do not call the mobile design final until it is reviewed. |
 | Matchmaker | Pending owner reference | Reuse these tokens only; do not invent its final layout, imagery, or progress styling. |
 | Results | Pending owner reference | Reuse these tokens only; do not invent its final card/list structure. |
-| Program Detail | Pending owner reference | Reuse these tokens only; do not invent its final hierarchy or source-health treatment. |
+| Program Detail — desktop | **Approved:** revised Program Detail reference selected on 2026-08-22 | Use the approved blue-pattern summary-band layout, raised program summary card, divider-led content column, and warm source-details rail. |
+| Program Detail — mobile | **Approved:** Program Detail mobile reference selected on 2026-08-22 | Use the approved single-column arrangement, source panel placement, and touch-target treatment. |
 
 ### Landing-page visual decisions
 
 - Hero: deep royal blue with a low-contrast woven/geometric Filipino pattern concentrated at the far right; real Filipino people fade naturally into the blue rather than sitting in a hard photo rectangle.
-- Brand: the sun mark is warm yellow. `ParaSa` is blue and `yo` is red in the wordmark; do not use the full flag palette throughout the UI.
+- Brand: the sun mark is warm yellow. `Para` is blue and `Sa'yo` is red in the wordmark; do not use the full flag palette throughout the UI.
 - Imagery: real photography is the default for hero, category, and program imagery. Avoid people illustrations except for the Jeepney matching state already defined in the Design Specification.
 - Icon language: use **filled** blue/navy pictograms in circular or rounded containers for trust, category, and process cues. Do not replace these with thin hollow outline icons.
 - Depth: major standalone components use soft elevation. Cards must feel lifted, not glossy, heavy, or stacked inside other cards.
 - Filipino identity: the pattern, sun accent, and restrained yellow/red details are supporting texture—not a dense decorative background.
+
+### Program Detail visual decisions
+
+- Use one shared Program Detail template. Its entry context changes the back destination and may add limited context; it does not create a second page design.
+- Explore entry: label the return action `Back to explore`; show standard program and source details only.
+- Results entry: label the return action `Back to your matches`. A small optional `Why this surfaced` section may appear **only** when contract-supplied qualitative match reasons exist.
+- Never display a numerical match score, percentage, unsupported eligibility conclusion, or inferred profile information. When matching reasons are absent, omit the panel rather than filling it with assumptions.
+- Desktop: use the consistent white navbar, a deep-blue woven pattern band, explicit back navigation, then a single raised program-summary surface with a photo slot, provider/logo slot, category, status, and last-checked date.
+- Body: use a broad divider-led content column for Description, Coverage, Benefits, Requirements, and Application, plus a warm right-hand Source Details rail.
+- Mobile: use a compact wordmark plus menu, then an explicit back action. Stack photo, program identity, status/date, and detail sections in that order. Place the full-width warm Source Details panel after core content, with a 44px-minimum `View source` CTA.
+- Source wording: use `Source details` and `View source`. Do not label the source official or call the action `Visit official source` unless backend authority data explicitly supports that claim.
+- All program imagery and agency logos remain owner-controlled slots. Never fabricate an agency logo.
 
 ## 2. Core tokens
 
@@ -104,7 +117,7 @@ Use these values as the project source of truth. Agents may not substitute a nea
 | Token group | Required use | Do not use it for |
 |---|---|---|
 | `brand-blue-700/600` | Hero, footer, primary navigation emphasis, filled trust-icon circles | Every card background or large body-text area |
-| `brand-red-500` | The `Sa'yo` part of the wordmark, a short active-nav rule, rare emphasis | Error state, body links, or broad background fills |
+| `brand-red-500` | The `yo` part of the wordmark, a short active-nav rule, rare emphasis | Error state, body links, or broad background fills |
 | `brand-yellow-500` | Sun mark, hero primary CTA, small process accents, focus ring | Large surfaces or secondary text |
 | `surface-warm` | Process and source-trust bands | All page sections |
 | `shadow-card` | Opportunity cards, program cards, trust rail | Nested content, list rows, every input, or every navigation item |
@@ -135,6 +148,8 @@ Do not hard-code imagery inside components. Put asset selection in one content/c
 | `landing.programs.{program}.image` | Program photo | 4:3 crop |
 | `landing.programs.{program}.agencyLogo` | Agency mark | 1:1 transparent SVG/PNG; use a neutral fallback only when absent |
 | `landing.sourceTrust.image` | Optional supporting trust photo/graphic | 4:3 crop |
+| `programDetail.summary.image` | Program summary photo | 4:3 desktop/mobile crop; allow `object-position` control |
+| `programDetail.agencyLogo` | Provider mark | 1:1 transparent SVG/PNG; use the neutral fallback when absent |
 
 The content layer must carry `alt`, `credit` or source note when needed, and `objectPosition`. Never invent an official agency logo; use an owner-supplied logo or an explicitly neutral fallback.
 
