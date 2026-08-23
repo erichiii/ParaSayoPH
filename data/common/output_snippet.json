@@ -1,0 +1,104 @@
+{
+  "title": "Megaworld Foundation Scholarship",
+  "provider": "Megaworld Foundation, Inc.",
+  "category": "scholarship",
+  "description": "The scholarship supports academically deserving students from financially challenged families by providing educational assistance and opportunities for personal, professional, and career development.",
+  "coverage": {
+    "type": "provincial",
+    "locations": [
+      "Metro Manila"
+    ]
+  },
+  "eligibility": {
+    "age": {
+      "min": -1,
+      "max": -1,
+      "raw_text": ""
+    },
+    "education": {
+      "levels": [
+        "third_year_college",
+        "second_year_college",
+        "incoming_first_year_college"
+      ],
+      "raw_text": "Be enrolled in an accepted degree program at a Megaworld Foundation partner school."
+    },
+    "employment": {
+      "statuses": [],
+      "raw_text": ""
+    },
+    "income": {
+      "min": -1,
+      "max": 400000,
+      "period": "annual",
+      "scope": "parents",
+      "raw_text": "Have parents whose combined gross annual income does not exceed ₱400,000."
+    },
+    "residency": {
+      "locations": [],
+      "raw_text": "Be a resident near a Megaworld township or project."
+    },
+    "fields": {
+      "categories": [
+        "business_management",
+        "engineering",
+        "technology",
+        "social_sciences_law"
+      ],
+      "programs": [
+        "accountancy",
+        "marketing",
+        "business_administration",
+        "hospitality_management",
+        "mechanical_engineering",
+        "computer_science",
+        "information_systems",
+        "information_technology",
+        "communication",
+        "psychology"
+      ],
+      "raw_text": "Applicants must be taking a course accepted by Megaworld Foundation and offered under an eligible partner school. The official application form uses a school-dependent course list, which means the available course options may differ from one college or university to another.\n\nPrograms appearing in the Foundation’s application system include courses in fields such as:\n\nAccountancy and accounting-related programs\n\nBusiness Administration, including Financial Management, Marketing Management, Operations Management, and Business Economics\n\nHospitality Management, Hotel and Restaurant Management, and Tourism-related programs\n\nArchitecture and selected design programs\n\nSelected Engineering programs, including Civil, Computer, Electrical, Electronics, Industrial, and Mechanical Engineering\n\nComputer Science, Information Systems, and Information Technology\n\nCommunication\n\nPsychology\n\nThis is not a complete list of accepted courses for every school. Applicants should select their college or university in the official online application form and check the courses that become available in the course field. They may also contact Megaworld Foundation to verify whether slots are currently available for their school and program."
+    },
+    "other_requirements": [
+      "Have a general average of at least 85% or its equivalent.",
+      "Have a grade of at least 80% in every subject.",
+      "Be enrolled in an accepted degree program at a Megaworld Foundation partner school."
+    ]
+  },
+  "benefits": [
+    "Full tuition fee support",
+    "Semestral allowances",
+    "Volunteerism activities",
+    "Trainings and seminars",
+    "Internship opportunities",
+    "Career opportunities after graduation"
+  ],
+  "requirements": [
+    "Current registration or enrollment form",
+    "Complete report of grades",
+    "Barangay Certificate of Residency of the applicant",
+    "Proof of the parents’ financial capacity, whichever is applicable (One-month payslip, Income Tax Return, Certificate of Compensation, Barangay Certificate of Indigency)",
+    "Birth certificate",
+    "Photographs of the applicant’s house",
+    "Photograph of the applicant with their family or guardian",
+    "Latest utility bills, such as electricity, water, rent, telephone, or internet bills",
+    "Official school ID",
+    "Complete final senior high school grade report showing an average of at least 85% or its equivalent, with no grade below 80% in any subject",
+    "Passing university entrance examination result, letter of admission, certificate of enrollment, or registration form",
+    "Certificate showing that the applicant belongs to the upper 10% of the graduating class or branch, if available",
+    "All grade reports from previous semesters through the current semester, showing a GPA of at least 85% or its equivalent and no grade below 80% in any subject",
+    "Full-load enrollment assessment or registration form with class schedule",
+    "Complete and most updated course curriculum"
+  ],
+  "application": {
+    "start_date": "",
+    "deadline": "2026-09-01",
+    "process": "Step 1: Access the Application Portal\n\nGo to the Megaworld Foundation Scholarship application portal using the link or button below. Choose your school or university and fill in your enrollment and graduation dates, school year, and any other required information.\n\nStep 11: Upload Documents",
+    "url": "https://www.megaworldfoundation.com/scholarship/apply/form"
+  },
+  "source": {
+    "url": "https://scholarship.com.ph/megaworld-foundation-scholarship/",
+    "last_verified_at": "2026-08-23T16:09:00.018Z"
+  },
+  "status": "open"
+}
