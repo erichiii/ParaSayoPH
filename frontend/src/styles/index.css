@@ -1337,61 +1337,6 @@ textarea {
   background-color: var(--color-brand-blue-700);
 }
 
-.ps-explore-hero::before {
-  position: absolute;
-  inset: 0 0 0 55%;
-  z-index: 0;
-  background-image: var(
-    --ps-explore-weave-image,
-    repeating-linear-gradient(45deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 0.875rem),
-    repeating-linear-gradient(-45deg, rgb(255 255 255 / 3%) 0 1px, transparent 1px 0.875rem)
-  );
-  background-position: right top;
-  background-repeat: repeat;
-  opacity: 0.13;
-  -webkit-mask-image: var(
-    --ps-explore-weave-image,
-    repeating-linear-gradient(45deg, white 0 1px, transparent 1px 0.875rem),
-    repeating-linear-gradient(-45deg, white 0 1px, transparent 1px 0.875rem)
-  );
-  mask-image: var(
-    --ps-explore-weave-image,
-    repeating-linear-gradient(45deg, white 0 1px, transparent 1px 0.875rem),
-    repeating-linear-gradient(-45deg, white 0 1px, transparent 1px 0.875rem)
-  );
-  content: '';
-  pointer-events: none;
-}
-
-.ps-explore-hero__sun {
-  position: absolute;
-  z-index: 0;
-  top: -1.5rem;
-  right: -1rem;
-  width: 14rem;
-  height: 14rem;
-  display: grid;
-  place-items: center;
-  background-image: var(
-    --ps-explore-sun-image,
-    repeating-conic-gradient(from -5deg, var(--color-brand-yellow-500) 0deg 8deg, transparent 8deg 18deg)
-  );
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  opacity: 0.95;
-  pointer-events: none;
-}
-
-.ps-explore-hero__sun::after {
-  display: var(--ps-explore-sun-center-display, block);
-  width: 38%;
-  aspect-ratio: 1;
-  border-radius: var(--radius-pill);
-  background: var(--color-brand-yellow-500);
-  content: '';
-}
-
 .ps-explore-hero__art {
   position: absolute;
   inset: 0 0 0 42%;

@@ -240,7 +240,6 @@ export function ExplorePage() {
 
       {/* Hero Banner with Search & Filters */}
       <section className="ps-explore-hero" style={exploreHeroArtStyles}>
-        <span aria-hidden="true" className="ps-explore-hero__sun" />
         <span aria-hidden="true" className="ps-explore-hero__art" />
         <SectionContainer className="ps-explore-hero__inner">
           <div className="ps-explore-hero__content">
