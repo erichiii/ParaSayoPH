@@ -12,25 +12,23 @@ app = FastAPI(
     title="ParaSayoPH API",
 )
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "https://your-project-id.appwrite.network",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
 app.include_router(ingestion_router)
 app.include_router(processing_router)
 app.include_router(programs_router)
 app.include_router(metrics_router)
 app.include_router(matching_router)
-
 
 @app.get("/health")
 def health_check():

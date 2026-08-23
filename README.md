@@ -1,5 +1,9 @@
 # <h2><p align="center">**ParaSayoPH :sunny:**</p></h2>
 
+<div align="center">
+  <img src="docs/front_page.png" alt="ParaSayo PH Front Page" width="100%">
+</div>
+
 ParaSa’yoPH is a self-healing discovery platform that gathers fragmented information about scholarships, government assistance, free training, and other public opportunities across the Philippines. It transforms scattered online postings into structured, validated, and searchable data, then matches users with programs based on their needs, location, education, employment status, and eligibility.
 
 <div align="center">
@@ -19,8 +23,6 @@ Many Filipinos miss valuable opportunities because information is scattered acro
 ParaSayo PH solves this by bringing relevant opportunities into one accessible platform. Instead of forcing users to search through countless sources, it helps them quickly discover programs they may qualify for and explains why each recommendation is relevant. Our platform is designed for Filipinos seeking education, employment, financial assistance, skills training, and other forms of public support.
 
 ## The Architecture
-
-### I. Crawler and Scraper
 
 ParaSayo PH uses a modular two-stage ETL pipeline powered entirely by custom Bright Data Scraper Studio collectors targeting three main Philippine directories (***[scholarship.com.ph](https://scholarship.com.ph/)***, ***[philscholar.com](https://philscholar.com/)***, and **[assistance.ph](https://assistance.ph/)**).
 
@@ -46,10 +48,6 @@ The scraper's execution environment applies the injected logic to map messy raw 
 
 </div>
 
-### II. PLACEHOLDER
-
-
----
 
 ## 🤖 AI Assistance Disclosure
 In accordance with [Scrape-Verse hackathon](https://www.wemakedevs.org/hackathons/scrape-verse) guidelines, AI coding assistants (including LLMs and development tools) were utilized during the development of this project for rapid prototyping, debugging assistance, and documentation structuring. All core architecture decisions, implementation of the Bright Data Scraper Studio pipelines, and verification of the codebase were entirely conducted, reviewed, and tested by the human team members.
