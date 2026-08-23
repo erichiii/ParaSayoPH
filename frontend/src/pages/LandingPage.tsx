@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { ProgramStatusBadge } from '../components/programs/ProgramStatusBadge'
 import { AgencyLogo } from '../components/ui/AgencyLogo'
+import { BrandWordmark } from '../components/ui/BrandWordmark'
 import { MediaSlot } from '../components/ui/MediaSlot'
 import { SectionContainer } from '../components/ui/SectionContainer'
 import { landingContent } from '../data/landingContent'
@@ -60,10 +61,7 @@ function LandingNav() {
   return (
     <header className="ps-landing-navbar">
       <SectionContainer className="ps-landing-navbar__inner">
-        <Link aria-label="ParaSa'yo home" className="ps-landing-wordmark" to="/">
-          <span aria-hidden="true" className="ps-landing-wordmark__sun" />
-          <span><span className="ps-landing-wordmark__para">Para</span><span className="ps-landing-wordmark__sayo">Sa&apos;yo</span></span>
-        </Link>
+        <BrandWordmark />
         <nav aria-label="Primary navigation" className="ps-landing-navbar__links">
           <Link to="/explore">Explore</Link>
           <Link to="/matchmaker">Para Sa Akin?</Link>

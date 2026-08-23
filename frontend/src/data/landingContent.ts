@@ -5,7 +5,7 @@ export const landingContent = {
   hero: {
     src: brandAssets.landingHero,
     alt: 'Filipino students, workers, and community members exploring opportunities',
-    objectPosition: 'center',
+    objectPosition: '100%',
   },
   categoryImages: {
     scholarship: { src: brandAssets.landingCategoryScholarship, alt: 'Scholarship opportunities', objectPosition: 'center' },

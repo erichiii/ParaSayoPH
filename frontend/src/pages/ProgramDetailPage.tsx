@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from 'react-router'
 import { ProgramNotFoundError, getProgramById } from '../api/programs'
 import { ProgramStatusBadge } from '../components/programs/ProgramStatusBadge'
 import { AgencyLogo } from '../components/ui/AgencyLogo'
+import { BrandWordmark } from '../components/ui/BrandWordmark'
 import { Card } from '../components/ui/Card'
 import { IconCircle } from '../components/ui/IconCircle'
 import { MediaSlot } from '../components/ui/MediaSlot'
@@ -214,13 +215,7 @@ function ProgramDetailContent({ id }: { id: string }) {
     <div className="ps-detail-page" style={programDetailBrandAssetStyles}>
       <header className="ps-detail-navbar">
         <SectionContainer className="ps-detail-navbar__inner">
-          <Link aria-label="ParaSa'yo home" className="ps-detail-wordmark" to="/">
-            <span aria-hidden="true" className="ps-detail-wordmark__sun" />
-            <span>
-              <span className="ps-detail-wordmark__para">Para</span>
-              <span className="ps-detail-wordmark__sayo">Sa'yo</span>
-            </span>
-          </Link>
+          <BrandWordmark />
           <nav aria-label="Primary navigation" className="ps-detail-navbar__links">
             <Link to="/explore">Explore</Link>
             <Link to="/matchmaker">Para Sa Akin?</Link>

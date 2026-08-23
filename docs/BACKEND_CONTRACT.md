@@ -124,7 +124,7 @@ type MatchProfile = {
 };
 ```
 
-`POST /api/match` accepts this direct body and returns `{ "results": MatchResult[] }`. It stores no profile data. Unknown fields, invalid IDs, negative/non-integer ages, duplicate categories, and `other` in `categories_needed` return `422`.
+`POST /api/match` accepts this direct body and returns `{ "results": MatchResult[], "recommendation"?: MatchRecommendation }`. It stores no profile data. Closed programs are excluded. Unknown fields, invalid IDs, negative/non-integer ages, duplicate categories, and `other` in `categories_needed` return `422`.
 
 Controlled values:
 
@@ -135,6 +135,10 @@ EducationLevelId: incoming_first_year_college, second_year_college, third_year_c
 ```
 
 `MatchResult` contains a public `Program`, `match_state`, and factual reason objects `{ code, label }`. The only states are `likely_eligible` and `uncertain`; known explicit conflicts are omitted. Public results never expose scores, points, ranks, profile data, raw rows, or operational fields.
+
+Results are ordered server-side: `likely_eligible` before `uncertain`, then `open`, `ongoing`, `upcoming`, `unknown`, then numeric program ID ascending. The frontend must preserve this order.
+
+`recommendation` is omitted unless an open `likely_eligible` result has at least two distinct confirmed structured eligibility groups among age, location, education, and employment, with no unresolved relevant requirement. It contains only an ID already present in `results` and factual reasons; it is not a score, rank, percentage, or eligibility guarantee.
 
 The approved reason-code vocabulary is:
 

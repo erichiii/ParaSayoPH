@@ -299,7 +299,7 @@ Each pill can open the corresponding edit control.
 
 Editing should avoid losing the current results context unnecessarily. 
 
-After change, the system can refresh or re-rank results. 
+After change, the system can refresh results while preserving the server-provided qualitative order.
 
 ### 6.3 Result card anatomy
 
@@ -318,7 +318,7 @@ After change, the system can refresh or re-rank results.
 
 ### 6.4 Ranking and explanation
 
-The exact ranking algorithm remains an engineering decision, but the UI should support explainability. A “Why this matched” area can summarize positive signals such as location, age, student status, education level, and requested category. Avoid presenting a precise numerical match score unless the underlying model can justify it consistently. 
+The UI preserves server-provided qualitative ordering and explains actual signals such as location, age, student status, education level, and requested category. An optional “Recommended based on confirmed details” section may appear only when supplied by the backend; it is not a top/best/ranked result or guarantee.
 
 ## 7. Running Jeepney Matching State
 

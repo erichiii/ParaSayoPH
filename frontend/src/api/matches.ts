@@ -1,6 +1,6 @@
 import { parseProgram } from './programs'
 import type { MatchProfile } from '../domain/profile'
-import type { MatchReason, MatchReasonCode, MatchResult, MatchState } from '../domain/matching'
+import type { MatchReason, MatchReasonCode, MatchRecommendation, MatchResponse, MatchResult, MatchState } from '../domain/matching'
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
 
@@ -69,7 +69,33 @@ function parseMatchResult(value: unknown): MatchResult {
   }
 }
 
-export async function getMatches(profile: MatchProfile): Promise<MatchResult[]> {
+function parseRecommendation(value: unknown, results: MatchResult[]): MatchRecommendation | null {
+  if (value === undefined) {
+    return null
+  }
+  if (!isRecord(value) || typeof value.program_id !== 'string' || !Array.isArray(value.reasons)) {
+    throw new MatchesApiError('The Matches API returned an invalid response.')
+  }
+
+  const recommended = results.find((result) => result.program.id === value.program_id)
+  const reasons = value.reasons.map(parseReason)
+  const evidenceGroups = new Set(reasons.map((reason) => ({
+    age_within_range: 'age',
+    coverage_location_match: 'location',
+    nationwide_coverage: 'location',
+    residency_location_match: 'location',
+    education_level_match: 'education',
+    employment_status_match: 'employment',
+  } as Partial<Record<MatchReasonCode, string>>)[reason.code]).filter(Boolean))
+
+  if (!recommended || recommended.state !== 'likely_eligible' || recommended.program.status !== 'open' || evidenceGroups.size < 2) {
+    throw new MatchesApiError('The Matches API returned an invalid response.')
+  }
+
+  return { programId: value.program_id, reasons }
+}
+
+export async function getMatches(profile: MatchProfile): Promise<MatchResponse> {
   let response: Response
   try {
     response = await fetch(`${apiBaseUrl}/api/match`, {
@@ -99,5 +125,6 @@ export async function getMatches(profile: MatchProfile): Promise<MatchResult[]> 
     throw new MatchesApiError('The Matches API returned an invalid response.', response.status)
   }
 
-  return value.results.map(parseMatchResult)
+  const results = value.results.map(parseMatchResult)
+  return { results, recommendation: parseRecommendation(value.recommendation, results) }
 }

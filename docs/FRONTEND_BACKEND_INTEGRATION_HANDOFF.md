@@ -212,11 +212,18 @@ One successful real request and response using the exact fields above.
         { "code": "age_criteria_unavailable", "label": "The published eligibility details do not include age information." }
       ]
     }
-  ]
+  ],
+  "recommendation": {
+    "program_id": "17",
+    "reasons": [
+      { "code": "coverage_location_match", "label": "Your location is listed in the program coverage." },
+      { "code": "age_within_range", "label": "Your age is within the listed age range." }
+    ]
+  }
 }
 ```
 
-No score, points, rank, percentage, profile data, raw data, or operational fields may be returned.
+Closed programs are excluded. The server orders `likely_eligible` before `uncertain`, then `open`, `ongoing`, `upcoming`, `unknown`, then program ID; the frontend preserves this order. `recommendation` is optional and appears only for an open likely-eligible result with two distinct confirmed eligibility groups. No score, points, rank, percentage, profile data, raw data, or operational fields may be returned.
 
 **Acceptance evidence supplied by backend**
 

@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
+import { BrandWordmark } from '../components/ui/BrandWordmark'
 import { Button } from '../components/ui/Button'
 import { SectionContainer } from '../components/ui/SectionContainer'
 import { brandAssets } from '../data/brandAssets'
@@ -421,10 +422,7 @@ function MatchmakerNav() {
   return (
     <header className="ps-matchmaker-navbar">
       <SectionContainer className="ps-matchmaker-navbar__inner">
-        <Link aria-label="ParaSa'yo home" className="ps-matchmaker-wordmark" to="/">
-          <span aria-hidden="true" className="ps-matchmaker-wordmark__sun" />
-          <span><span className="ps-matchmaker-wordmark__para">Para</span><span className="ps-matchmaker-wordmark__sayo">Sa&apos;yo</span></span>
-        </Link>
+        <BrandWordmark />
         <nav aria-label="Primary navigation" className="ps-matchmaker-navbar__links"><Link to="/explore">Explore</Link><Link aria-current="page" className="is-active" to="/matchmaker">Para Sa Akin?</Link></nav>
         <Link className="ps-matchmaker-navbar__cta" to="/explore">Explore programs</Link>
       </SectionContainer>

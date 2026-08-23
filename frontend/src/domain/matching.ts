@@ -30,3 +30,13 @@ export type MatchResult = {
   state: MatchState
   reasons: MatchReason[]
 }
+
+export type MatchRecommendation = {
+  programId: string
+  reasons: MatchReason[]
+}
+
+export type MatchResponse = {
+  results: MatchResult[]
+  recommendation: MatchRecommendation | null
+}

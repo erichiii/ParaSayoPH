@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router'
 import { getPrograms } from '../api/programs'
 import { AgencyLogo } from '../components/ui/AgencyLogo'
+import { BrandWordmark } from '../components/ui/BrandWordmark'
 import { Card } from '../components/ui/Card'
 import { IconCircle } from '../components/ui/IconCircle'
 import { SectionContainer } from '../components/ui/SectionContainer'
@@ -23,6 +24,14 @@ const exploreBrandStyles: ExploreBrandStyles = {
   ...(brandAssets.wovenPattern
     ? {
         '--ps-explore-weave-image': `url("${brandAssets.wovenPattern}")`,
+      }
+    : {}),
+}
+
+const exploreHeroArtStyles: ExploreBrandStyles = {
+  ...(brandAssets.landingHero
+    ? {
+        '--ps-explore-hero-art-image': `url("${brandAssets.landingHero}")`,
       }
     : {}),
 }
@@ -206,13 +215,7 @@ export function ExplorePage() {
       {/* Top Navbar */}
       <header className="ps-explore-navbar">
         <SectionContainer className="ps-explore-navbar__inner">
-          <Link aria-label="ParaSa'yo home" className="ps-explore-wordmark" to="/">
-            <span aria-hidden="true" className="ps-explore-wordmark__sun" />
-            <span>
-              <span className="ps-explore-wordmark__para">Para</span>
-              <span className="ps-explore-wordmark__sayo">Sa'yo</span>
-            </span>
-          </Link>
+          <BrandWordmark />
           <nav aria-label="Primary navigation" className="ps-explore-navbar__links">
             <Link className="ps-explore-navbar__link--active" to="/explore">
               Explore
@@ -236,8 +239,9 @@ export function ExplorePage() {
       </header>
 
       {/* Hero Banner with Search & Filters */}
-      <section className="ps-explore-hero">
+      <section className="ps-explore-hero" style={exploreHeroArtStyles}>
         <span aria-hidden="true" className="ps-explore-hero__sun" />
+        <span aria-hidden="true" className="ps-explore-hero__art" />
         <SectionContainer className="ps-explore-hero__inner">
           <div className="ps-explore-hero__content">
             <p className="ps-explore-hero__eyebrow">Public Support and Opportunities</p>

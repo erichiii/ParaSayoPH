@@ -92,5 +92,11 @@ class MatchResult(BaseModel):
     reasons: list[MatchReason] = Field(min_length=1)
 
 
+class MatchRecommendation(BaseModel):
+    program_id: str
+    reasons: list[MatchReason] = Field(min_length=1)
+
+
 class MatchResponse(BaseModel):
     results: list[MatchResult]
+    recommendation: MatchRecommendation | None = None

@@ -207,12 +207,12 @@ The report documents a FastAPI backend using Pydantic for structural validation,
 
 |**Signal**|**Comparison**|**Effect**|
 |---|---|---|
-|**Category intent**|profile.categories_needed vs program.category.|Positive ranking signal; no assumption when the profile has no selected categories.|
+|**Category intent**|profile.categories_needed vs program.category.|Relevance filter when selected; no assumption when the profile has no selected categories.|
 |**Location**|profile.location vs coverage and explicit residency eligibility.|Positive alignment; conflicting known residency can be a negative/exclusion signal; unknown is uncertain.|
 |**Age**|exact profile.age vs eligibility.age.min/max.|Positive within known range; known out-of-range may be excluded/flagged; absent program/profile age is not negative.|
 |**Education**|normalized profile.education_level vs eligibility.education.levels.|Positive when aligned; no penalty when program has no structured education rule.|
 |**Employment**|normalized profile.employment_status vs eligibility.employment.statuses.|Positive when aligned; absent data remains uncertain.|
-|**Freshness/status**|program.status and source.last_verified_at.|Filtering/display decision, not proof of eligibility. Closed can be deprioritized or excluded.|
+|**Freshness/status**|program.status and source.last_verified_at.|Closed programs are excluded from matching; remaining results are ordered open, ongoing, upcoming, unknown within qualitative state.|
 
 
 
@@ -223,12 +223,13 @@ The report documents a FastAPI backend using Pydantic for structural validation,
 |**program**|Canonical public program summary, with no raw staging/internal data.|
 |**match_state**|Qualitative state such as likely_eligible, uncertain, or known_conflict where evidence supports it.|
 |**reasons[]**|Short reason objects containing a stable signal ID and user-readable copy; only emit facts backed by program + profile data.|
+|**recommendation**|Optional open likely-eligible result with at least two confirmed distinct eligibility groups and no unresolved relevant requirement; omit when no result qualifies.|
 |**unknown_requirements[]**|Optional concise list of missing/ambiguous signals that limit confidence.|
 |**source_meta**|Source URL, provider/authority label, last_checked, and application URL only when safe and known.|
 
 
 
-**No black box:** Do not expose a precise percentage match unless the algorithm, calibration, and explanation model can justify it consistently. Qualitative state plus actual reasons is the MVP baseline. 
+**No black box:** Do not expose a precise percentage match, score, rank, or top/best claim. Results order is qualitative state, availability, then program ID; recommendation is evidence-gated and explainable.
 
 ### 6.3 Required match APIs (MVP proposal)
 

@@ -149,12 +149,14 @@ Public support and opportunity information in the Philippines is fragmented acro
 |---|---|---|
 |**Likely eligible**|Known profile evidence aligns with structured criteria.|Use qualified, positive language and show the basis; never present as approval.|
 |**Uncertain**|A requirement, source fact, or user profile value is missing or ambiguous.|Explain what is unknown and offer a way to refine the profile or read official requirements.|
-|**Known conflict**|Known evidence conflicts with a clearly structured requirement.|May omit from ranked recommendations or mark the conflict, according to product strategy; never call missing data a conflict.|
+|**Known conflict**|Known evidence conflicts with a clearly structured requirement.|May omit from personalized results or mark the conflict, according to product strategy; never call missing data a conflict.|
 |**Unknown program status**|Availability cannot be reliably determined.|Show “Status unknown” rather than assuming open or ongoing.|
 
 
 
 **Non-negotiable:** Unknown must not silently become false. Missing age, location, deadline, provider, or eligibility detail is not evidence of ineligibility, closure, or source authority. 
+
+An optional recommendation may appear only for an open program with sufficient confirmed structured eligibility evidence and no relevant unresolved requirement. It must show its factual basis and must not claim a best/top result, score, rank, percentage, or guarantee.
 
 ### 4.3 Trust and source rules
 

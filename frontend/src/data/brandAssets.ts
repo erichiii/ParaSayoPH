@@ -53,7 +53,7 @@ export const brandAssets: BrandAssets = {
   landingCategoryOfwAssistance: getOwnerAsset('../assets/landing/category-ofw-assistance.jpg'),
   landingCategoryScholarship: getOwnerAsset('../assets/landing/category-scholarship.jpg'),
   landingCategoryTraining: getOwnerAsset('../assets/landing/category-training.jpg'),
-  landingHero: getOwnerAsset('../assets/landing/hero.jpg'),
+  landingHero: getOwnerAsset('../assets/landing/hero.svg'),
   landingProgramMedicalAssistanceLogo: getOwnerAsset('../assets/landing/program-medical-assistance-logo.svg'),
   landingProgramScholarshipLogo: getOwnerAsset('../assets/landing/program-scholarship-logo.svg'),
   landingProgramTrainingLogo: getOwnerAsset('../assets/landing/program-training-logo.svg'),

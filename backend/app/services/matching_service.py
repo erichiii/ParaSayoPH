@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from app.schemas.matching import MatchProfile, MatchReason, MatchReasonCode, MatchResult
+from app.schemas.matching import (
+    MatchProfile,
+    MatchRecommendation,
+    MatchReason,
+    MatchReasonCode,
+    MatchResult,
+)
 from app.schemas.public_program import PublicProgram
 
 
@@ -22,6 +28,14 @@ LOCALITY_REGIONS = {
     "SOCCSKSARGEN": "region_12",
 }
 NATIONWIDE_LOCALITY = "Philippines"
+CONFIRMED_ELIGIBILITY_GROUPS = {
+    "age_within_range": "age",
+    "coverage_location_match": "location",
+    "nationwide_coverage": "location",
+    "residency_location_match": "location",
+    "education_level_match": "education",
+    "employment_status_match": "employment",
+}
 
 REASON_LABELS: dict[MatchReasonCode, str] = {
     "category_selected": "Matches a category you selected.",
@@ -197,3 +211,23 @@ def match_program(profile: MatchProfile, program: PublicProgram) -> MatchResult 
         match_state="uncertain" if uncertain else "likely_eligible",
         reasons=reasons,
     )
+
+
+def select_recommendation(results: list[MatchResult]) -> MatchRecommendation | None:
+    """Select one open result with sufficient confirmed eligibility evidence."""
+    for result in results:
+        if result.match_state != "likely_eligible" or result.program.status != "open":
+            continue
+
+        evidence_groups = {
+            CONFIRMED_ELIGIBILITY_GROUPS[reason.code]
+            for reason in result.reasons
+            if reason.code in CONFIRMED_ELIGIBILITY_GROUPS
+        }
+        if len(evidence_groups) >= 2:
+            return MatchRecommendation(
+                program_id=result.program.id,
+                reasons=result.reasons,
+            )
+
+    return None

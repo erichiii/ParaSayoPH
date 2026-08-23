@@ -70,9 +70,10 @@ Rules:
 ## 5. Matching and trust behavior
 
 - Matching is qualitative, not a percentage score.
-- Use supported states such as `likely_eligible`, `uncertain`, and `known_conflict` only when evidence supports them.
+- Use supported states `likely_eligible` and `uncertain` only when evidence supports them; omit known explicit conflicts.
 - Missing profile or program information produces uncertainty, never a known conflict.
 - Reasons must be factual and traceable to submitted profile data plus canonical program data.
+- Matching excludes closed programs. An optional recommendation requires confirmed structured evidence and must not be presented as a score, rank, percentage, or guarantee.
 - ParaSa'yo is an aggregator. It does not issue programs and does not guarantee eligibility or approval.
 - Use an official application action only when the backend has verified an official destination. Otherwise label the action as an information/source visit accurately.
 
