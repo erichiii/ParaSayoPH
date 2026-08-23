@@ -4,6 +4,7 @@
 .venv/
 about/
 requirements.txt
+!backend/requirements.txt
 __pycache__/
 *.pyc
 supabase/
