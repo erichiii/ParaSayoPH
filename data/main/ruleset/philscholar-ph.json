@@ -1,0 +1,738 @@
+{
+    "id": "9a94b267-f0ca-40b6-84aa-19dfa1ef26d2",
+    "rules": {
+        "cleaning": {
+            "title": [
+                {
+                    "flags": "gi",
+                    "pattern": "\\bMega\\s+World\\b",
+                    "replacement": "Megaworld"
+                },
+                {
+                    "flags": "g",
+                    "pattern": "20\\d{2}[–-]20\\d{2}",
+                    "replacement": ""
+                },
+                {
+                    "flags": "gi",
+                    "pattern": "\\b(Application Guide|Comprehensive Guide|Application Process|Guide|Philippines|Online Form|Details|Overview)\\b",
+                    "replacement": ""
+                }
+            ]
+        },
+        "providers": {
+            "Grab": [
+                "GRAB",
+                "GRABSCHOLAR"
+            ],
+            "Pinas Cargo": [
+                "PINAS CARGO"
+            ],
+            "InLife Foundation": [
+                "INLIFE FOUNDATION",
+                "INSULAR LIFE FOUNDATION",
+                "GOLD EAGLE"
+            ],
+            "Tagum Cooperative": [
+                "TAGUM COOPERATIVE"
+            ],
+            "GT Foundation, Inc.": [
+                "GT FOUNDATION",
+                "GT-YES",
+                "GT-REAP"
+            ],
+            "Griffith University": [
+                "GRIFFITH UNIVERSITY",
+                "GRIFFITH COLLEGE",
+                "GELI",
+                "JOHN WILLETT INTERNATIONAL SCHOLARSHIP",
+                "ROTARY CLUB OF SOUTHPORT CYRIL RICHARDE AM INTERNATIONAL SCHOLARSHIP"
+            ],
+            "SM Foundation, Inc.": [
+                "SM FOUNDATION"
+            ],
+            "BPI Foundation, Inc.": [
+                "BPI FOUNDATION",
+                "BPI PAGPUPUGAY"
+            ],
+            "KCC Foundation, Inc.": [
+                "KCC FOUNDATION",
+                "KCCFI"
+            ],
+            "Fulbright Philippines": [
+                "FULBRIGHT PHILIPPINES",
+                "PHILIPPINE-AMERICAN EDUCATIONAL FOUNDATION",
+                "PAEF",
+                "FULBRIGHT",
+                "FULLBRIGHT",
+                "UGRAD",
+                "HUBERT H. HUMPHREY FELLOWSHIP PROGRAM"
+            ],
+            "Ayala Foundation, Inc.": [
+                "AYALA FOUNDATION"
+            ],
+            "Quezon City Government": [
+                "QUEZON CITY GOVERNMENT",
+                "QCYDO",
+                "QUEZON CITY YOUTH DEVELOPMENT"
+            ],
+            "Vicsal Foundation, Inc.": [
+                "VICSAL FOUNDATION",
+                "VSF"
+            ],
+            "Vivant Foundation, Inc.": [
+                "VIVANT FOUNDATION",
+                "VIVANT STEM"
+            ],
+            "Chulalongkorn University": [
+                "CHULALONGKORN UNIVERSITY",
+                "CHULALONGKORN ASEAN AND NON-ASEAN SCHOLARSHIP"
+            ],
+            "Davao City Water District": [
+                "DAVAO CITY WATER DISTRICT",
+                "DCWD"
+            ],
+            "Moirasia Foundation, Inc.": [
+                "MOIRASIA FOUNDATION",
+                "MOIRASIA YOUTH EXCELLENCE",
+                "MYES"
+            ],
+            "Cebu Provincial Government": [
+                "CEBU PROVINCIAL GOVERNMENT",
+                "CP-GIFTS"
+            ],
+            "Del Monte Foundation, Inc.": [
+                "DEL MONTE FOUNDATION",
+                "DMFI"
+            ],
+            "Megaworld Foundation, Inc.": [
+                "MEGAWORLD FOUNDATION",
+                "MEGAWORLD",
+                "MEGA WORLD"
+            ],
+            "Palawan Group of Companies": [
+                "PALAWAN GROUP OF COMPANIES",
+                "PALAWAN PAWNSHOP",
+                "PALAWAN SCHOLARSHIP"
+            ],
+            "Iloilo Provincial Government": [
+                "ILOILO PROVINCIAL GOVERNMENT",
+                "ISKOLAR SANG ILOILO",
+                "ISIP"
+            ],
+            "Land Bank of the Philippines": [
+                "LANDBANK",
+                "LAND BANK",
+                "LCDFI"
+            ],
+            "Palawan Electric Cooperative": [
+                "PALAWAN ELECTRIC COOPERATIVE",
+                "PALECO"
+            ],
+            "Dowell Appliances Philippines": [
+                "DOWELL APPLIANCES",
+                "DOWELL SCHOLARSHIP",
+                "DOWELL"
+            ],
+            "Gokongwei Brothers Foundation": [
+                "GOKONGWEI BROTHERS FOUNDATION",
+                "GBF"
+            ],
+            "Mercury Drug Foundation, Inc.": [
+                "MERCURY DRUG FOUNDATION",
+                "MDFI",
+                "GAWAD TALINO"
+            ],
+            "Commission on Higher Education": [
+                "CHED",
+                "COMMISSION ON HIGHER EDUCATION",
+                "UNIFAST",
+                "BPMSP",
+                "BAGONG PILIPINAS MERIT SCHOLARSHIP PROGRAM"
+            ],
+            "Security Bank Foundation, Inc.": [
+                "SECURITY BANK FOUNDATION",
+                "SECURITY BANK",
+                "SBFI"
+            ],
+            "Sugar Regulatory Administration": [
+                "SUGAR REGULATORY ADMINISTRATION",
+                "SRA"
+            ],
+            "Cebuana Lhuillier Foundation, Inc.": [
+                "CEBUANA LHUILLIER FOUNDATION",
+                "CEBUANA LHUILLIER",
+                "CLFI"
+            ],
+            "Development Bank of the Philippines": [
+                "DEVELOPMENT BANK OF THE PHILIPPINES",
+                "DBP INSPIRE",
+                "DBP"
+            ],
+            "Embassy of Japan in the Philippines": [
+                "EMBASSY OF JAPAN IN THE PHILIPPINES",
+                "EMBASSY OF JAPAN"
+            ],
+            "Government Service Insurance System": [
+                "GSIS",
+                "GOVERNMENT SERVICE INSURANCE SYSTEM"
+            ],
+            "Department of Science and Technology": [
+                "DOST",
+                "SCIENCE AND TECHNOLOGY",
+                "DOST-SEI"
+            ],
+            "Andres P. Tamayo Sr. Foundation, Inc.": [
+                "ANDRES P. TAMAYO SR. FOUNDATION",
+                "APTSFI"
+            ],
+            "Overseas Workers Welfare Administration": [
+                "OWWA",
+                "OVERSEAS WORKERS WELFARE ADMINISTRATION"
+            ],
+            "Bureau of Fisheries and Aquatic Resources": [
+                "BFAR",
+                "BUREAU OF FISHERIES AND AQUATIC RESOURCES"
+            ],
+            "National Commission on Indigenous Peoples": [
+                "NCIP",
+                "NATIONAL COMMISSION ON INDIGENOUS PEOPLES"
+            ],
+            "Toyota Motor Philippines School of Technology": [
+                "TOYOTA MOTOR PHILIPPINES",
+                "TMP TECH",
+                "TOYOTA SCHOLARSHIP"
+            ],
+            "Peace Corps Alumni Foundation for Philippine Development": [
+                "PCAFPD",
+                "PEACE CORPS ALUMNI FOUNDATION"
+            ],
+            "Ministry of Education, Culture, Sports, Science and Technology": [
+                "MEXT",
+                "MONBUKAGAKUSHO"
+            ],
+            "Philippine Army Finance Center Producers Integrated Cooperative": [
+                "PAFCPIC",
+                "PHILIPPINE ARMY FINANCE CENTER"
+            ],
+            "PHINMA": [
+                "PHINMA"
+            ],
+            "Tzu Chi Foundation": [
+                "TZU CHI FOUNDATION"
+            ],
+            "Charity First Foundation": [
+                "CHARITY FIRST FOUNDATION"
+            ],
+            "Maybank Foundation": [
+                "MAYBANK",
+                "ASEAN-MAYBANK"
+            ],
+            "Manaaki New Zealand": [
+                "MANAAKI NEW ZEALAND"
+            ],
+            "University of Melbourne": [
+                "UNIVERSITY OF MELBOURNE",
+                "MELBOURNE UNIVERSITY"
+            ],
+            "Ajinomoto Foundation": [
+                "AJINOMOTO FOUNDATION"
+            ]
+        },
+        "blacklists": {
+            "pages": [
+                "what are scholarship programs",
+                "what are local scholarships",
+                "what are national scholarships",
+                "what are government scholarships",
+                "getting started with scholarship guides",
+                "what is a foundational scholarship",
+                "types of scholarships",
+                "list of higher education institutions",
+                "comprehensive list of programs",
+                "explore ncr scholarships",
+                "browse car scholarships"
+            ],
+            "advice": [
+                "prepare your documents",
+                "check if the",
+                "confirm that you",
+                "review the accepted",
+                "follow the correct",
+                "submit your application",
+                "keep a copy",
+                "check your email",
+                "apply early",
+                "read the official requirements",
+                "watch the video below",
+                "guide covers",
+                "this guide will help",
+                "stay vigilant for these updates",
+                "beware of fake"
+            ]
+        },
+        "extraction": {
+            "age": {
+                "flags": "i",
+                "pattern": "(?:(?:not\\s*more\\s*than|no\\s*more\\s*than|no\\s*older\\s*than|maximum\\s*of|under|below|must\\s*be\\s*at\\s*most)\\s*(\\d{1,2})\\s*(?:years?\\s*(?:old|of\\s*age)?|y\\/?o)|\\b(\\d{1,2})\\s*years?\\s*old\\s*or\\s*younger|\\bage\\s*(?:limit\\s*of|of|must\\s*be\\s*(?:under|below|at\\s*most))?\\s*(\\d{1,2})\\b)",
+                "exclusions": [
+                    "%",
+                    "percent",
+                    "grade",
+                    "average",
+                    "gpa",
+                    "score"
+                ]
+            },
+            "date": {
+                "flags": "i",
+                "months": {
+                    "apr": "04",
+                    "aug": "08",
+                    "dec": "12",
+                    "feb": "02",
+                    "jul": "07",
+                    "jun": "06",
+                    "mar": "03",
+                    "may": "05",
+                    "nov": "11",
+                    "oct": "10",
+                    "sep": "09",
+                    "july": "07",
+                    "june": "06",
+                    "sept": "09",
+                    "april": "04",
+                    "march": "03",
+                    "august": "08",
+                    "january": "01",
+                    "october": "10",
+                    "december": "12",
+                    "february": "02",
+                    "november": "11",
+                    "september": "09"
+                },
+                "pattern": "(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\\s+(\\d{1,2}),?\\s+(\\d{4})"
+            },
+            "income": {
+                "flags": "i",
+                "pattern": "(?:₱|PHP|Php|P|USD|US\\$|\\$)\\s*([\\d,]+(?:\\.\\d+)?)",
+                "keywords": [
+                    "income",
+                    "gross",
+                    "salary",
+                    "financial capacity",
+                    "earnings",
+                    "financial eligibility"
+                ],
+                "scope_mapping": {
+                    "family": [
+                        "family",
+                        "household"
+                    ],
+                    "parents": [
+                        "parent",
+                        "father",
+                        "mother"
+                    ],
+                    "individual": [
+                        "individual",
+                        "personal"
+                    ]
+                },
+                "period_mapping": {
+                    "annual": [
+                        "annual",
+                        "yearly",
+                        "per year",
+                        "per annum",
+                        "year"
+                    ],
+                    "monthly": [
+                        "monthly",
+                        "per month",
+                        "month"
+                    ]
+                }
+            },
+            "coverage": {
+                "locations": [
+                    "Iloilo",
+                    "Palawan",
+                    "Cebu",
+                    "Quezon City",
+                    "Metro Manila",
+                    "Davao City",
+                    "SOCCSKSARGEN",
+                    "Bukidnon",
+                    "Misamis Oriental",
+                    "Benguet",
+                    "Mountain Province",
+                    "Negros Occidental",
+                    "Baguio"
+                ],
+                "nationwide_keywords": [
+                    "nationwide",
+                    "philippines"
+                ]
+            },
+            "education": {
+                "flags": "i",
+                "levels": {
+                    "tvet": "tvet|technical-vocational|tesda",
+                    "senior_high_school": "scholarship for senior high|open to (?:grade 11|grade 12|senior high students)",
+                    "third_year_college": "junior|third year|3rd year",
+                    "fourth_year_college": "fourth year|4th year|graduating college",
+                    "second_year_college": "sophomore|second year|2nd year",
+                    "incoming_first_year_college": "freshm[ae]n|incoming first-year|incoming 1st year|first year college|1st year college"
+                },
+                "raw_text_triggers": {
+                    "action": "cover|open|support|eligib|enrolled|pursu",
+                    "subject": "freshm[ae]n|sophomores?|juniors?|undergraduate|college|year level|degree program|doctoral|master's"
+                },
+                "is_college_pattern": "college|undergraduate|bachelor|degree|freshm[ae]n|sophomore|junior|senior|tertiary"
+            },
+            "residency": {
+                "raw_triggers": "resident|residency|residing|township|project"
+            },
+            "fields_of_study": {
+                "education": {
+                    "secondary_education": [
+                        "\\b(?:Bachelor of|BSEd)?\\s*Secondary Education\\b"
+                    ],
+                    "elementary_education": [
+                        "\\b(?:Bachelor of|BEEd)?\\s*Elementary Education\\b"
+                    ],
+                    "special_needs_education": [
+                        "\\b(?:Bachelor of|BEd)?\\s*Special Needs Education\\b"
+                    ]
+                },
+                "technology": {
+                    "data_science": [
+                        "\\b(?:BS\\s*)?Data Science\\b"
+                    ],
+                    "computer_science": [
+                        "\\b(?:BS\\s*)?Computer Science\\b",
+                        "\\bCS\\b"
+                    ],
+                    "information_systems": [
+                        "\\b(?:BS\\s*)?Information Systems\\b",
+                        "\\bIS\\b"
+                    ],
+                    "computer_engineering": [
+                        "\\b(?:BS\\s*)?Computer Engineering\\b",
+                        "\\bCpE\\b"
+                    ],
+                    "software_engineering": [
+                        "\\b(?:BS\\s*)?Software Engineering\\b"
+                    ],
+                    "computer_applications": [
+                        "\\b(?:BS\\s*)?Computer Applications\\b"
+                    ],
+                    "information_technology": [
+                        "\\b(?:BS\\s*)?Information Technology\\b",
+                        "\\bIT\\b"
+                    ]
+                },
+                "engineering": {
+                    "civil_engineering": [
+                        "\\b(?:BS\\s*)?Civil Engineering\\b",
+                        "\\bCE\\b"
+                    ],
+                    "chemical_engineering": [
+                        "\\b(?:BS\\s*)?Chemical Engineering\\b",
+                        "\\bChE\\b"
+                    ],
+                    "electrical_engineering": [
+                        "\\b(?:BS\\s*)?Electrical Engineering\\b",
+                        "\\bEE\\b"
+                    ],
+                    "industrial_engineering": [
+                        "\\b(?:BS\\s*)?Industrial Engineering\\b",
+                        "\\bIE\\b"
+                    ],
+                    "mechanical_engineering": [
+                        "\\b(?:BS\\s*)?Mechanical Engineering\\b",
+                        "\\bME\\b"
+                    ],
+                    "electronics_engineering": [
+                        "\\b(?:BS\\s*)?Electronics(?: and Communications)? Engineering\\b",
+                        "\\bECE\\b"
+                    ]
+                },
+                "health_sciences": {
+                    "nursing": [
+                        "\\b(?:BS\\s*)?Nursing\\b",
+                        "\\bBSN\\b"
+                    ],
+                    "medicine": [
+                        "\\bMedicine\\b",
+                        "\\bMD\\b"
+                    ],
+                    "pharmacy": [
+                        "\\b(?:BS\\s*)?Pharmacy\\b"
+                    ],
+                    "physical_therapy": [
+                        "\\b(?:BS\\s*)?Physical Therapy\\b",
+                        "\\bPT\\b"
+                    ],
+                    "medical_technology": [
+                        "\\b(?:BS\\s*)?Medical Technology\\b",
+                        "\\bMedTech\\b"
+                    ],
+                    "radiologic_technology": [
+                        "\\b(?:BS\\s*)?Radiologic Technology\\b",
+                        "\\bRadTech\\b"
+                    ]
+                },
+                "business_management": {
+                    "finance": [
+                        "\\b(?:BS\\s*)?Finance\\b"
+                    ],
+                    "marketing": [
+                        "\\b(?:BS\\s*)?Marketing\\b"
+                    ],
+                    "accountancy": [
+                        "\\b(?:BS\\s*)?Accountancy\\b",
+                        "\\bBSA\\b",
+                        "\\bAccounting\\b"
+                    ],
+                    "entrepreneurship": [
+                        "\\b(?:BS\\s*)?Entrepreneurship\\b"
+                    ],
+                    "management_accounting": [
+                        "\\b(?:BS\\s*)?Management Accounting\\b"
+                    ],
+                    "hospitality_management": [
+                        "\\b(?:BS\\s*)?Hospitality Management\\b"
+                    ],
+                    "business_administration": [
+                        "\\b(?:BS\\s*)?Business Administration\\b",
+                        "\\bBSBA\\b"
+                    ]
+                },
+                "social_sciences_law": {
+                    "law": [
+                        "\\bLaw\\b",
+                        "\\bJuris Doctor\\b"
+                    ],
+                    "psychology": [
+                        "\\b(?:BS|BA\\s*)?Psychology\\b"
+                    ],
+                    "criminology": [
+                        "\\b(?:BS|BA\\s*)?Criminology\\b"
+                    ],
+                    "communication": [
+                        "\\b(?:BS|BA\\s*)?Communication\\b"
+                    ],
+                    "legal_management": [
+                        "\\b(?:BS|BA\\s*)?Legal Management\\b"
+                    ],
+                    "political_science": [
+                        "\\b(?:BS|BA\\s*)?Political Science\\b"
+                    ]
+                },
+                "agriculture_fisheries": {
+                    "forestry": [
+                        "\\b(?:BS\\s*)?Forestry\\b"
+                    ],
+                    "fisheries": [
+                        "\\b(?:BS\\s*)?Fisheries\\b"
+                    ],
+                    "agriculture": [
+                        "\\b(?:BS\\s*)?Agriculture\\b"
+                    ],
+                    "agricultural_engineering": [
+                        "\\b(?:BS\\s*)?Agricultural and Biosystems Engineering\\b"
+                    ]
+                },
+                "natural_sciences_math": {
+                    "biology": [
+                        "\\b(?:BS\\s*)?Biology\\b"
+                    ],
+                    "physics": [
+                        "\\b(?:BS\\s*)?Physics\\b"
+                    ],
+                    "chemistry": [
+                        "\\b(?:BS\\s*)?Chemistry\\b"
+                    ],
+                    "statistics": [
+                        "\\b(?:BS\\s*)?Statistics\\b"
+                    ],
+                    "mathematics": [
+                        "\\b(?:BS\\s*)?Mathematics\\b",
+                        "\\bApplied Math(?:ematics)?\\b"
+                    ],
+                    "environmental_science": [
+                        "\\b(?:BS\\s*)?Environmental Science\\b"
+                    ]
+                }
+            },
+            "other_requirements": {
+                "mixed_conditions": "grade|gpa|average|citizen|moral|health|exam|score",
+                "income_exclusions": "income|gross|₱|php|\\$"
+            }
+        },
+        "dom_traversal": {
+            "step_pattern": "^step\\s*\\d+",
+            "intro_triggers": "supports academically deserving students|provides educational assistance|aims to help",
+            "content_wrapper": ".entry-content",
+            "section_triggers": {
+                "fields": [
+                    "priority course",
+                    "priority courses",
+                    "fields of study",
+                    "field of study",
+                    "accepted courses",
+                    "eligible courses",
+                    "degree program",
+                    "academic program",
+                    "courses available"
+                ],
+                "ignore": [
+                    "partner school",
+                    "partner schools",
+                    "partner institutions",
+                    "partner organization",
+                    "partner organizations",
+                    "contact",
+                    "contact details",
+                    "contact information",
+                    "about",
+                    "final thought",
+                    "final thoughts",
+                    "reference",
+                    "references",
+                    "post disclaimer",
+                    "disclaimer",
+                    "frequently asked questions",
+                    "faq",
+                    "terms and conditions",
+                    "grounds for disqualification",
+                    "grounds for termination",
+                    "return service agreement",
+                    "maintenance of scholarship"
+                ],
+                "process": [
+                    "how to apply",
+                    "application process",
+                    "step-by-step",
+                    "steps to apply",
+                    "application procedure"
+                ],
+                "benefits": [
+                    "benefit",
+                    "scholarship package",
+                    "grant details",
+                    "financial assistance"
+                ],
+                "deadline": [
+                    "deadline",
+                    "timeline",
+                    "important dates",
+                    "schedule",
+                    "application period",
+                    "application status"
+                ],
+                "requirements": [
+                    "requirement",
+                    "document",
+                    "what to submit",
+                    "documentary"
+                ],
+                "qualifications": [
+                    "qualification",
+                    "eligible",
+                    "eligibility",
+                    "who can apply"
+                ]
+            },
+            "nested_list_keywords": "whichever is applicable|either|or|any of the following",
+            "process_action_keywords": [
+                "submit",
+                "portal",
+                "fill",
+                "upload"
+            ],
+            "application_url_triggers": [
+                "access application",
+                "apply form",
+                "application portal",
+                "/apply/form",
+                "forms.gle",
+                "docs.google.com/forms",
+                "apply online",
+                "online application form",
+                "apply to study",
+                "apply for the scholarship",
+                "form.jotform.com",
+                "eais.ncip.gov.ph",
+                "bpms.ched.gov.ph",
+                "science-scholarships.ph",
+                "scholarship.owwa.gov.ph"
+            ]
+        },
+        "crawler_config": {
+            "depth_1": {
+                "filters": {
+                    "must_exclude": [
+                        "mailto:",
+                        "tel:",
+                        "/category/",
+                        "/author/",
+                        "/page/",
+                        "about",
+                        "contact"
+                    ]
+                },
+                "link_attribute": "href",
+                "list_selectors": [
+                    "h2.wp-block-post-title a",
+                    "article h2.entry-title a",
+                    "article h3.entry-title a",
+                    "main article h2 a",
+                    ".post-title a"
+                ],
+                "pagination_selectors": [
+                    "a.wp-block-query-pagination-next",
+                    "link[rel=\"next\"]",
+                    "a.next.page-numbers"
+                ]
+            },
+            "start_url": "https://philscholar.com/category/scholarship-programs/",
+            "target_depth": 2
+        },
+        "status_evaluation": {
+            "open": [
+                "applications ... are now open",
+                "are now open",
+                "accepting applications",
+                "is now open",
+                "apply now"
+            ],
+            "closed": [
+                "already closed",
+                "application is currently closed",
+                "applications are currently closed",
+                "application period is closed",
+                "is currently closed",
+                "is closed",
+                "closed for the latest",
+                "now closed",
+                "deadline has passed",
+                "applications are now closed",
+                "no longer accepting"
+            ]
+        },
+        "url_cleanup_params": [
+            "fbclid",
+            "utm_source",
+            "utm_medium",
+            "utm_campaign"
+        ]
+    },
+    "version": "1.0.0",
+    "is_active": true,
+    "created_at": "2026-08-20T17:18:17.280025+00:00",
+    "updated_at": "2026-08-20T17:57:21.079674+00:00",
+    "source_domain": "philscholar.com"
+}
