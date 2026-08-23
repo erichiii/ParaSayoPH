@@ -2216,6 +2216,14 @@ textarea {
 .ps-landing-program-row__meta { display: grid; justify-items: start; gap: var(--space-2); }
 .ps-landing-program-row__meta p { margin: 0; color: var(--color-ink-500); font-size: var(--font-size-caption); white-space: nowrap; }
 
+.ps-landing-program-row--skeleton { opacity: 0.9; pointer-events: none; }
+.ps-skeleton-line { display: block; height: 0.875rem; border-radius: 0.25rem; background: var(--color-border-subtle); }
+.ps-skeleton-line--title { width: 60%; height: 1rem; margin-bottom: var(--space-2); }
+.ps-skeleton-line--text { width: 80%; }
+.ps-skeleton-line--badge { width: 5.5rem; height: 1.25rem; }
+.ps-landing-empty-state { display: grid; justify-items: center; gap: var(--space-3); padding: var(--space-6); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-card); background: var(--color-surface-default); text-align: center; }
+.ps-landing-empty-state p { margin: 0; color: var(--color-ink-700); font-size: var(--font-size-small); }
+
 .ps-landing-source-note { padding-block: var(--space-8); background: var(--color-surface-blue-soft); }
 .ps-landing-source-note__inner { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-5); }
 .ps-landing-source-note__media { width: 10rem; border-radius: var(--radius-card); }

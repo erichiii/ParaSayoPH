@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
+import { getPrograms } from '../api/programs'
 import { ProgramStatusBadge } from '../components/programs/ProgramStatusBadge'
 import { AgencyLogo } from '../components/ui/AgencyLogo'
 import { BrandWordmark } from '../components/ui/BrandWordmark'
 import { MediaSlot } from '../components/ui/MediaSlot'
 import { SectionContainer } from '../components/ui/SectionContainer'
 import { landingContent } from '../data/landingContent'
-import { localDemoPrograms } from '../data/mockPrograms'
 import { programCategoryLabels } from '../data/taxonomies'
 import type { Program } from '../domain/program'
 
@@ -24,15 +24,12 @@ const landingCategories: LandingCategory[] = [
   { category: 'ofw_assistance', description: 'Support for OFWs and families' },
 ]
 
-const previewProgramIds = [
-  'tulong-aral-scholarship',
-  'workready-skills-training',
-  'medical-assistance-program',
-]
-
-const previewPrograms = previewProgramIds
-  .map((id) => localDemoPrograms.find((program) => program.id === id))
-  .filter((program): program is Program => Boolean(program))
+const previewStatusOrder: Record<string, number> = {
+  open: 0,
+  ongoing: 1,
+  upcoming: 2,
+  unknown: 3,
+}
 
 const checkedDateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
@@ -85,6 +82,29 @@ function LandingNav() {
 export function LandingPage() {
   const [heroFailed, setHeroFailed] = useState(false)
   const hasHeroImage = Boolean(landingContent.hero.src) && !heroFailed
+  const [previewPrograms, setPreviewPrograms] = useState<Program[] | null>(null)
+  const [previewError, setPreviewError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isCurrent = true
+    void getPrograms()
+      .then((programs) => {
+        if (!isCurrent) return
+        const filtered = programs
+          .filter((program) => program.status !== 'closed')
+          .sort((a, b) => (previewStatusOrder[a.status] ?? 99) - (previewStatusOrder[b.status] ?? 99))
+          .slice(0, 3)
+        setPreviewPrograms(filtered)
+      })
+      .catch(() => {
+        if (!isCurrent) return
+        setPreviewError('We could not load programs right now.')
+        setPreviewPrograms([])
+      })
+    return () => {
+      isCurrent = false
+    }
+  }, [])
 
   return (
     <div className="ps-landing-page">
@@ -139,13 +159,49 @@ export function LandingPage() {
         <section className="ps-landing-section ps-landing-programs">
           <SectionContainer>
             <div className="ps-landing-section-heading"><h2>Programs you can explore</h2><Link to="/explore">View all <span aria-hidden="true">→</span></Link></div>
-            <div className="ps-landing-program-list">
-              {previewPrograms.map((program) => {
-                const logo = landingContent.programAgencyLogos[program.id as keyof typeof landingContent.programAgencyLogos]
-                const checkedDate = formatCheckedDate(program.source.last_verified_at)
-                return <article className="ps-landing-program-row" key={program.id}><AgencyLogo alt={logo?.alt ?? ''} className="ps-landing-program-row__logo" objectPosition={logo?.objectPosition} src={logo?.src} /><div className="ps-landing-program-row__content"><h3>{program.title}</h3>{program.provider ? <p>{program.provider}</p> : <p>{programCategoryLabels[program.category]}</p>}<small>{program.description ?? programCategoryLabels[program.category]}</small></div><div className="ps-landing-program-row__meta"><ProgramStatusBadge status={program.status} />{checkedDate ? <p>ParaSa&apos;yo checked {checkedDate}</p> : null}</div><Link className="ps-landing-program-row__action" state={{ from: 'explore', returnTo: '/explore' }} to={`/programs/${program.id}`}>View details <span aria-hidden="true">→</span></Link></article>
-              })}
-            </div>
+            {previewPrograms === null ? (
+              <div className="ps-landing-program-list" aria-busy="true" aria-label="Loading programs">
+                {[0, 1, 2].map((index) => (
+                  <article key={index} className="ps-landing-program-row ps-landing-program-row--skeleton" aria-hidden="true">
+                    <AgencyLogo className="ps-landing-program-row__logo" />
+                    <div className="ps-landing-program-row__content">
+                      <span className="ps-skeleton-line ps-skeleton-line--title" />
+                      <span className="ps-skeleton-line ps-skeleton-line--text" />
+                    </div>
+                    <div className="ps-landing-program-row__meta">
+                      <span className="ps-skeleton-line ps-skeleton-line--badge" />
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : previewError || previewPrograms.length === 0 ? (
+              <div className="ps-landing-empty-state">
+                <p>{previewError ?? 'No programs to show right now.'}</p>
+                <Link className="ps-button ps-button--primary" to="/explore">Explore opportunities <span aria-hidden="true">→</span></Link>
+              </div>
+            ) : (
+              <div className="ps-landing-program-list">
+                {previewPrograms.map((program) => {
+                  const logo = landingContent.programAgencyLogos[program.id as keyof typeof landingContent.programAgencyLogos]
+                  const checkedDate = formatCheckedDate(program.source.last_verified_at)
+                  return (
+                    <article className="ps-landing-program-row" key={program.id}>
+                      <AgencyLogo alt={logo?.alt ?? ''} className="ps-landing-program-row__logo" objectPosition={logo?.objectPosition} src={logo?.src} />
+                      <div className="ps-landing-program-row__content">
+                        <h3>{program.title}</h3>
+                        {program.provider ? <p>{program.provider}</p> : <p>{programCategoryLabels[program.category]}</p>}
+                        <small>{program.description ?? programCategoryLabels[program.category]}</small>
+                      </div>
+                      <div className="ps-landing-program-row__meta">
+                        <ProgramStatusBadge status={program.status} />
+                        {checkedDate ? <p>ParaSa&apos;yo checked {checkedDate}</p> : null}
+                      </div>
+                      <Link className="ps-landing-program-row__action" state={{ from: 'explore', returnTo: '/explore' }} to={`/programs/${program.id}`}>View details <span aria-hidden="true">→</span></Link>
+                    </article>
+                  )
+                })}
+              </div>
+            )}
           </SectionContainer>
         </section>
 
